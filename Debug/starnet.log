@@ -1,2 +1,3 @@
 ﻿  main.cpp
-  starnet.vcxproj -> C:\Users\HackJ\Desktop\starnet\Debug\starnet.exe
+c:\users\hackj\desktop\starnet\starnet\socket.h(29): error C2512: 'starnet::NetAddress': non è disponibile alcun costruttore predefinito appropriato
+  c:\users\hackj\desktop\starnet\starnet\net_address.h(12): note: vedere la dichiarazione di 'starnet::NetAddress'
