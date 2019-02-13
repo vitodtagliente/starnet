@@ -39,9 +39,9 @@ void server_main()
 	Socket sck;
 	if (sck.initialize(NetAddress::AddressFamily::IPv4))
 	{
-		if (sck.bind(NetAddress{ 80 }))
+		if (sck.bind(NetAddress{ 9999 }))
 		{
-
+			cout << "Socket binded" << endl;
 		}
 		else cout << "Unable to bind the port" << endl;
 	}
