@@ -37,13 +37,23 @@ int main()
 void server_main()
 {
 	Socket sck;
-	if (sck.initialize(NetAddress::AddressFamily::IPv4))
+	if (sck.initialize(NetAddress::Family::IPv4))
 	{
-		if (sck.bind(NetAddress{ 9999 }))
+		NetAddress address(NetAddress::UnusedPort);
+		if (address.isValid())
 		{
-			cout << "Socket binded" << endl;
+			if (sck.bind(address))
+			{
+				cout << "Socket binded" << endl;
+			}
+			else starnet::log("Unable to bind the port");
 		}
-		else cout << "Unable to bind the port" << endl;
+		else
+		{
+			if (address.getState() == NetAddress::State::Error)
+				cout << "Address error" << endl;
+			else cout << "Address malformed" << endl;
+		}
 	}
 	else cout << "Cannot initialize the socket" << endl;
 }

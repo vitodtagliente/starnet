@@ -22,7 +22,7 @@ namespace starnet
 			UDP
 		};
 
-		enum class Shutdown
+		enum Shutdown
 		{
 			Send = SD_SEND,
 			Receive = SD_RECEIVE,
@@ -58,10 +58,10 @@ namespace starnet
 		bool operator== (const Socket& other) const { return m_socket == other.m_socket; }
 		bool operator!= (const Socket& other) const { return !(*this == other); }
 
-		inline bool initialize(const NetAddress::AddressFamily family)
+		inline bool initialize(const NetAddress::Family family)
 		{
 			m_socket = socket(
-				// address family
+				// address family, network layer protocol
 				family,
 				// type of socket
 				(m_type == Type::UDP) ? SOCK_DGRAM : SOCK_STREAM,
@@ -88,7 +88,7 @@ namespace starnet
 
 		inline bool shutdown(Shutdown mode = Shutdown::Send)
 		{
-			return ::shutdown(m_socket, (int)mode) == 0;
+			return ::shutdown(m_socket, mode) == 0;
 		}
 
 	private:
