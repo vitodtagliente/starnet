@@ -5,6 +5,12 @@
 
 namespace starnet
 {
+#ifdef WIN32
+	typedef SOCKET PlatformSocket;
+#else
+	typedef int PlatformSocket;
+#endif
+
 	// socket wrapper 
 	class Socket
 	{
@@ -14,6 +20,13 @@ namespace starnet
 		{
 			TCP,
 			UDP
+		};
+
+		enum class Shutdown
+		{
+			Send = SD_SEND,
+			Receive = SD_RECEIVE,
+			Both = SD_BOTH
 		};
 
 		Socket(const Type type = Type::UDP)
@@ -30,17 +43,37 @@ namespace starnet
 
 		virtual ~Socket() = default;
 
-		inline const SOCKET& getSocket() const { return m_socket; }
+		inline PlatformSocket getSocket() const { return m_socket; }
 		inline Type getType() const { return m_type; }
 
-		inline bool isValid() const { return m_socket != INVALID_SOCKET; }
+		inline bool isValid() const 
+		{ 
+#if WIN32
+			return m_socket != INVALID_SOCKET;
+#else
+			return m_socket > 0;
+#endif
+		}
 
 		bool operator== (const Socket& other) const { return m_socket == other.m_socket; }
 		bool operator!= (const Socket& other) const { return !(*this == other); }
 
+		inline bool initialize(const NetAddress::AddressFamily family)
+		{
+			m_socket = socket(
+				// address family
+				family,
+				// type of socket
+				(m_type == Type::UDP) ? SOCK_DGRAM : SOCK_STREAM,
+				// if 0, OS pick the default implemented transport protocol for the given socket type
+				(m_type == Type::UDP) ? IPPROTO_UDP : IPPROTO_TCP
+			);
+			return isValid();
+		}
+
 		inline bool bind(const NetAddress& address)
 		{
-			if (::bind(0, &address.getSocketAddress(), address.getSize()) != BindSuccess)
+			if (::bind(m_socket, &address.getSocketAddress(), address.getSize()) != 0)
 			{
 				// #todo: error management
 				return false;
@@ -48,24 +81,21 @@ namespace starnet
 			return true;
 		}
 
-	private:
-
-		inline void initialize(const NetAddress::AddressFamily family)
+		inline bool close() 
 		{
-			m_socket = socket(
-				family,
-				(m_type == Type::UDP) ? SOCK_DGRAM : SOCK_STREAM,
-				(m_type == Type::UDP) ? IPPROTO_UDP : IPPROTO_TCP
-			);
+			return ::closesocket(m_socket);
 		}
 
+		inline bool shutdown(Shutdown mode = Shutdown::Send)
+		{
+			return ::shutdown(m_socket, (int)mode) == 0;
+		}
+
+	private:
+
 		// socket data
-		SOCKET m_socket;
+		PlatformSocket m_socket;
 		// socket type
 		Type m_type;
-
-		static const int BindSuccess;
 	};
-
-	const int Socket::BindSuccess{ 0 };
 }

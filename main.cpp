@@ -20,10 +20,15 @@ int main()
 	cout << "[0: Server, 1: Client]: ";
 	cin >> choice;
 
-	if (choice == 0)
-		server_main();
-	else client_main();
-	
+	if (starnet::startup())
+	{
+		if (choice == 0)
+			server_main();
+		else client_main();
+
+		starnet::shutdown();
+	}	
+
     cout << "Premi un tasto per continuare...";
 	int pause;
 	cin >> pause;
@@ -31,7 +36,16 @@ int main()
 
 void server_main()
 {
+	Socket sck;
+	if (sck.initialize(NetAddress::AddressFamily::IPv4))
+	{
+		if (sck.bind(NetAddress{ 80 }))
+		{
 
+		}
+		else cout << "Unable to bind the port" << endl;
+	}
+	else cout << "Cannot initialize the socket" << endl;
 }
 
 void client_main()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "net_address.h"
 #include "net_stream.h"
 #include "socket.h"
@@ -9,7 +10,7 @@ namespace starnet
 	bool startup()
 	{
 #if WIN32
-		LPWSADATA WSAData;
+		LPWSADATA WSAData{};
 		return WSAStartup(MAKEWORD(2, 2), WSAData) == 0;
 #else
 		// Unix

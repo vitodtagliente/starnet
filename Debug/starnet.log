@@ -1,4 +1,2 @@
-﻿  pch.cpp
-  main.cpp
-c:\users\vito.tagliente\desktop\starnet\socket.h(29): error C2512: 'starnet::NetAddress': no appropriate default constructor available
-  c:\users\vito.tagliente\desktop\starnet\net_address.h(12): note: see declaration of 'starnet::NetAddress'
+﻿  main.cpp
+  starnet.vcxproj -> C:\Users\HackJ\Desktop\starnet\Debug\starnet.exe
