@@ -42,6 +42,22 @@ namespace starnet
 			return !(*this == other);
 		}
 
+		inline sockaddr getSocketAddress() const
+		{
+			sockaddr addr {};
+			sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&addr);
+			addr_in->sin_family = protocol;
+			addr_in->sin_port = htons(port);
+#if WIN32
+			InetPton(protocol,
+				std::wstring{ address.begin(), address.end() }.c_str(),
+				&addr_in->sin_addr);
+#else
+			inet_pton(protocol, address.c_str(), &addr_in->sin_addr);
+#endif
+			return addr;
+		}
+
 		std::string address;
 		uint16_t port;
 		NetworkProtocol protocol;

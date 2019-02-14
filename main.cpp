@@ -41,7 +41,7 @@ void server_main()
 	{
 		if (sock.bind())
 		{
-			cout << "Socket binded!" << endl;
+			cout << "Socket binded successfully!" << endl;
 		}
 		else
 		{

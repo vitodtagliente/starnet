@@ -75,18 +75,8 @@ namespace starnet
 		
 		inline bool bind()
 		{
-			struct sockaddr_in addr_in {};
-			addr_in.sin_family = m_address.protocol;
-			addr_in.sin_port = htons(m_address.port);
-#if WIN32
-			InetPton(m_address.protocol, 
-				std::wstring{ m_address.address.begin(), m_address.address.end() }.c_str(),
-				&addr_in.sin_addr);
-#else
-			inet_pton(m_address.protocol, m_address.address.c_str(), &addr_in.sin_addr);
-#endif
-
-			return ::bind(m_socket, (sockaddr*)&addr_in, sizeof(addr_in)) >= 0;
+			const sockaddr& sock_address = m_address.getSocketAddress();
+			return ::bind(m_socket, &sock_address, sizeof(sock_address)) >= 0;
 		}
 
 		inline bool close() 
