@@ -7,6 +7,9 @@ namespace starnet
 {
 	struct NetAddress
 	{		
+		typedef sockaddr NativeAddress;
+		typedef sockaddr_in NativeAddresIn;
+
 		// defined as address family in socket terminology, 
 		// indicates the network layer protocol which the socket should employ.
 		enum NetworkProtocol
@@ -42,10 +45,10 @@ namespace starnet
 			return !(*this == other);
 		}
 
-		inline sockaddr getSocketAddress() const
+		inline NativeAddress getNativeAddress() const
 		{
-			sockaddr addr {};
-			sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&addr);
+			NativeAddress addr {};
+			NativeAddresIn* addr_in = reinterpret_cast<NativeAddresIn*>(&addr);
 			addr_in->sin_family = protocol;
 			addr_in->sin_port = htons(port);
 #if WIN32
