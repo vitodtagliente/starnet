@@ -18,7 +18,7 @@ int main()
 
 	int choice = 0;
 	cout << "[0: Server, 1: Client]: ";
-	cin >> choice;
+	//cin >> choice;
 
 	if (starnet::startup())
 	{
@@ -36,26 +36,22 @@ int main()
 
 void server_main()
 {
-	Socket sck;
-	if (sck.initialize(NetAddress::Family::IPv4))
+	Socket sock({ NetAddress::localAddress, 9706 });
+	if (sock.isValid())
 	{
-		NetAddress address(NetAddress::UnusedPort);
-		if (address.isValid())
+		if (sock.bind())
 		{
-			if (sck.bind(address))
-			{
-				cout << "Socket binded" << endl;
-			}
-			else starnet::log("Unable to bind the port");
+			cout << "Socket binded!" << endl;
 		}
 		else
 		{
-			if (address.getState() == NetAddress::State::Error)
-				cout << "Address error" << endl;
-			else cout << "Address malformed" << endl;
+			cout << "Invalid socket binding: " << starnet::getErrorMessage() << endl;
 		}
 	}
-	else cout << "Cannot initialize the socket" << endl;
+	else
+	{
+		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
+	}
 }
 
 void client_main()

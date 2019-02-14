@@ -1,50 +1,65 @@
 #pragma once
 
 #include "common.h"
+#include "error.h"
 #include "net_address.h"
 
 namespace starnet
 {
+	// define a shared SocketType that match the platform specific type definition
 #ifdef WIN32
-	typedef SOCKET PlatformSocket;
+	typedef SOCKET NativeSocketType;
 #else
-	typedef int PlatformSocket;
+	typedef int NativeSocketType;
 #endif
 
 	// socket wrapper 
 	class Socket
 	{
 	public:
-
-		enum class Type
+		
+		// transport layer protocol
+		enum TransportProtocol
 		{
-			TCP,
-			UDP
+			TCP = IPPROTO_TCP,
+			UDP = IPPROTO_UDP
 		};
 
-		enum Shutdown
+		enum Type
+		{
+			// Raw = SOCK_RAW,
+			Stream = SOCK_STREAM,
+			Datagram = SOCK_DGRAM
+		};
+
+		enum ShutdownMode
 		{
 			Send = SD_SEND,
 			Receive = SD_RECEIVE,
 			Both = SD_BOTH
 		};
 
-		Socket(const Type type = Type::UDP)
-			: m_socket{ INVALID_SOCKET }, m_type{ type }
-		{ 
-		
+		Socket(const NetAddress& address, const TransportProtocol protocol = TransportProtocol::UDP)
+			: m_address{ address }, m_protocol{ protocol }
+		{
+			m_socket = ::socket(
+				// address family / network layer protocol
+				m_address.protocol,
+				// type of socket
+				(m_protocol == TransportProtocol::UDP) ? Type::Datagram : Type::Stream,
+				// if 0, OS pick the default implemented transport protocol for the given socket type
+				m_protocol
+			);
 		}
 
-		Socket(const Socket& socket)
-		{
-			m_socket = socket.m_socket;
-			m_type = socket.m_type;
-		}
+		Socket(const Socket&) = delete;
+		Socket& operator= (const Socket&) = delete;
 
 		virtual ~Socket() = default;
 
-		inline PlatformSocket getSocket() const { return m_socket; }
-		inline Type getType() const { return m_type; }
+		inline NativeSocketType getNativeSocket() const { return m_socket; }
+		inline TransportProtocol getTransportProtocol() const { return m_protocol; }
+		inline const NetAddress& getAddress() const { return m_address; }
 
 		inline bool isValid() const 
 		{ 
@@ -57,28 +72,21 @@ namespace starnet
 
 		bool operator== (const Socket& other) const { return m_socket == other.m_socket; }
 		bool operator!= (const Socket& other) const { return !(*this == other); }
-
-		inline bool initialize(const NetAddress::Family family)
+		
+		inline bool bind()
 		{
-			m_socket = socket(
-				// address family, network layer protocol
-				family,
-				// type of socket
-				(m_type == Type::UDP) ? SOCK_DGRAM : SOCK_STREAM,
-				// if 0, OS pick the default implemented transport protocol for the given socket type
-				(m_type == Type::UDP) ? IPPROTO_UDP : IPPROTO_TCP
-			);
-			return isValid();
-		}
+			struct sockaddr_in addr_in {};
+			addr_in.sin_family = m_address.protocol;
+			addr_in.sin_port = htons(m_address.port);
+#if WIN32
+			InetPton(m_address.protocol, 
+				std::wstring{ m_address.address.begin(), m_address.address.end() }.c_str(),
+				&addr_in.sin_addr);
+#else
+			inet_pton(m_address.protocol, m_address.address.c_str(), &addr_in.sin_addr);
+#endif
 
-		inline bool bind(const NetAddress& address)
-		{
-			if (::bind(m_socket, &address.getSocketAddress(), address.getSize()) != 0)
-			{
-				// #todo: error management
-				return false;
-			}
-			return true;
+			return ::bind(m_socket, (sockaddr*)&addr_in, sizeof(addr_in)) >= 0;
 		}
 
 		inline bool close() 
@@ -86,16 +94,18 @@ namespace starnet
 			return ::closesocket(m_socket);
 		}
 
-		inline bool shutdown(Shutdown mode = Shutdown::Send)
+		inline bool shutdown(ShutdownMode mode = ShutdownMode::Send)
 		{
 			return ::shutdown(m_socket, mode) == 0;
 		}
 
 	private:
 
-		// socket data
-		PlatformSocket m_socket;
-		// socket type
-		Type m_type;
+		// native socket data
+		NativeSocketType m_socket;
+		// nework address 
+		NetAddress m_address;
+		// transport layer protocol
+		TransportProtocol m_protocol;
 	};
 }

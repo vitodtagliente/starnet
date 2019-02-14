@@ -1,8 +1,7 @@
 #pragma once
 
-#include <functional>
-#include <iostream>
 #include "common.h"
+#include "error.h"
 #include "net_address.h"
 #include "net_stream.h"
 #include "socket.h"
@@ -19,12 +18,6 @@ namespace starnet
 		// Unix
 #endif
 	}
-
-	// override this function to define custom log behaviour
-	std::function<void(const std::string&)> log = [](const std::string& text) 
-	{
-		std::cout << text << std::endl;
-	};
 
 	bool shutdown()
 	{
