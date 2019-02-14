@@ -98,4 +98,50 @@ namespace starnet
 		// transport layer protocol
 		TransportProtocol m_protocol;
 	};
+
+	class UDPSocket : public Socket
+	{
+	public:
+
+		UDPSocket(const NetAddress& address)
+			: Socket(address, TransportProtocol::UDP)
+		{
+
+		}
+
+		inline bool send(const std::string& data, const NetAddress& other) const
+		{
+			const NetAddress::NativeAddressType& addr_out = other.getNativeAddress();
+			return ::sendto(getNativeSocket(), data.c_str(), data.length(), 0, &addr_out, sizeof(addr_out));
+		}
+
+		inline bool receive(std::string& out, const NetAddress& other) const 
+		{
+			NetAddress::NativeAddressType addr_out = other.getNativeAddress();
+			int size = sizeof(addr_out);
+			char buffer[100];
+			int bytecount = ::recvfrom(
+				getNativeSocket(),
+				buffer,
+				sizeof(buffer),
+				0,
+				&(addr_out),
+				&size
+			);
+			out = std::string{ buffer };
+			return bytecount >= 0;
+		}
+
+	};
+
+	class TCPSocket : public Socket
+	{
+		TCPSocket(const NetAddress& address)
+			: Socket(address, TransportProtocol::TCP)
+		{
+
+		}
+
+
+	};
 }

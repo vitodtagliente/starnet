@@ -17,7 +17,7 @@ int main()
 
 	int choice = 0;
 	cout << "[0: Server, 1: Client]: ";
-	//cin >> choice;
+	cin >> choice;
 
 	if (starnet::startup())
 	{
@@ -35,12 +35,20 @@ int main()
 
 void server_main()
 {
-	Socket sock({ NetAddress::localAddress, 9706 });
+	UDPSocket sock({ NetAddress::localAddress, 9706 });
 	if (sock.isValid())
 	{
 		if (sock.bind())
 		{
 			cout << "Socket binded successfully!" << endl;
+			cout << "Press to send a message...";
+			int response;
+			cin >> response;
+			if (sock.send("ciao mondo", { NetAddress::localAddress, 9000 }))
+			{
+				cout << "Message sent!" << endl;
+			}
+			else cout << "Unable to send the message" << endl;
 		}
 		else
 		{
@@ -55,5 +63,26 @@ void server_main()
 
 void client_main()
 {
-
+	UDPSocket sock({ NetAddress::localAddress, 9000 });
+	if (sock.isValid())
+	{
+		if (sock.bind())
+		{
+			cout << "Socket binded successfully!" << endl;
+			std::string message{};
+			if (sock.receive(message, { NetAddress::localAddress, 9706 }))
+			{
+				cout << "Message: " << message << endl;
+			}
+			else cout << "Unable to receive a message" << endl;
+		}
+		else
+		{
+			cout << "Invalid socket binding: " << starnet::getErrorMessage() << endl;
+		}
+	}
+	else
+	{
+		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
+	}
 }
