@@ -21,22 +21,13 @@
     <ClInclude Include="starnet.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="reflection.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="common.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="net_stream.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="socket.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="error.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="net_address.last.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="net_address.h">

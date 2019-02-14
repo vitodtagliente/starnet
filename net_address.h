@@ -7,8 +7,9 @@ namespace starnet
 {
 	struct NetAddress
 	{		
-		typedef sockaddr NativeAddress;
-		typedef sockaddr_in NativeAddresIn;
+		typedef sockaddr NativeAddressType;
+		typedef sockaddr_in NativeAddresInType;
+		typedef uint16_t PortType;
 
 		// defined as address family in socket terminology, 
 		// indicates the network layer protocol which the socket should employ.
@@ -19,7 +20,7 @@ namespace starnet
 		};
 		
 		NetAddress(const std::string& in_address = localAddress, 
-			const uint16_t in_port = unusedPort, 
+			const PortType in_port = unusedPort,
 			const NetworkProtocol in_protocol = NetworkProtocol::IPv4)
 			: address{ in_address }, port{ in_port }, protocol{ in_protocol }
 		{
@@ -45,10 +46,10 @@ namespace starnet
 			return !(*this == other);
 		}
 
-		inline NativeAddress getNativeAddress() const
+		inline NativeAddressType getNativeAddress() const
 		{
-			NativeAddress addr {};
-			NativeAddresIn* addr_in = reinterpret_cast<NativeAddresIn*>(&addr);
+			NativeAddressType addr {};
+			NativeAddresInType* addr_in = reinterpret_cast<NativeAddresInType*>(&addr);
 			addr_in->sin_family = protocol;
 			addr_in->sin_port = htons(port);
 #if WIN32
@@ -66,7 +67,7 @@ namespace starnet
 		NetworkProtocol protocol;
 
 		static const std::string localAddress;
-		static const uint16_t unusedPort;
+		static const PortType unusedPort;
 	};
 
 	const std::string NetAddress::localAddress{ "127.0.0.1" };

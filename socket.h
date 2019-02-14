@@ -75,7 +75,7 @@ namespace starnet
 		
 		inline bool bind()
 		{
-			const NetAddress::NativeAddress& sock_address = m_address.getNativeAddress();
+			const NetAddress::NativeAddressType& sock_address = m_address.getNativeAddress();
 			return ::bind(m_socket, &sock_address, sizeof(sock_address)) >= 0;
 		}
 

@@ -3,7 +3,6 @@
 #include "common.h"
 #include "error.h"
 #include "net_address.h"
-#include "net_stream.h"
 #include "socket.h"
 
 namespace starnet
