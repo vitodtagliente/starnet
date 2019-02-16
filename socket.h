@@ -142,20 +142,20 @@ namespace starnet
 
 			// #todo: buffer size 
 			char buffer[100];
-			if (const int bytecount = ::recvfrom(
+			const int bytecount = ::recvfrom(
 				m_socket,
 				buffer,
 				sizeof(buffer),
 				0,
 				&address,
 				&size
-			))
+			);
+			if (bytecount >= 0)
 			{
 				message = { buffer, (unsigned int)bytecount };
 				fromAddress = { address, m_address.getProtocol() };
 				return true;
 			}
-			// error
 			return false;
 		}
 
@@ -216,25 +216,26 @@ namespace starnet
 
 		inline bool send(const std::string& message)
 		{
-			
-			return false;
+			// note that a nonzero return value does not imply any data
+			// was sent, just that data was queued to be sent.
+			return ::send(m_socket, message.c_str(), message.length(), 0) >= 0;
 		}
-
-		inline bool send(const Socket& socket, const std::string& message)
-		{
-
-			return false;
-		}
-
+		
 		inline bool receive(std::string& message) const
 		{
-
-			return false;
-		}
-
-		inline bool receive(const Socket& socket, std::string& message) const
-		{
-
+			// #todo: buffer size 
+			char buffer[100];
+			const int bytecount = ::recv(
+				m_socket,
+				buffer,
+				sizeof(buffer),
+				0
+			);
+			if (bytecount >= 0)
+			{
+				message = { buffer, (unsigned int)bytecount };
+				return true;
+			}
 			return false;
 		}
 	};

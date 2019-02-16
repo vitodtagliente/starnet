@@ -8,8 +8,11 @@
 using namespace std;
 using namespace starnet;
 
-void server_main();
-void client_main();
+void server_main_udp();
+void client_main_udp();
+
+void server_main_tcp();
+void client_main_tcp();
 
 int main()
 {
@@ -22,8 +25,8 @@ int main()
 	if (starnet::startup())
 	{
 		if (choice == 0)
-			server_main();
-		else client_main();
+			server_main_tcp();
+		else client_main_tcp();
 
 		starnet::shutdown();
 	}	
@@ -33,7 +36,7 @@ int main()
 	cin >> pause;
 }
 
-void server_main()
+void server_main_udp()
 {
 	UDPSocket sock({ Address::localAddress, 9706 });
 	if (sock.isValid())
@@ -61,7 +64,44 @@ void server_main()
 	}
 }
 
-void client_main()
+void server_main_tcp()
+{
+	TCPSocket sock({ Address::localAddress, 9706 });
+	if (sock.isValid())
+	{
+		if (sock.bind())
+		{
+			if (sock.listen())
+			{
+				cout << "Socket listening successfully!" << endl;
+
+				if (TCPSocket* clientSocket = sock.accept())
+				{
+					cout << "Press to send a message...";
+					int response;
+					cin >> response;
+					if (clientSocket->send("ciao mondo"))
+					{
+						cout << "Message sent!" << endl;
+					}
+					else cout << "Unable to send the message" << endl;
+				}
+				else cout << "Unable to accept client's socket" << endl;
+			}
+			else cout << "Unable to listen..." << endl;
+		}
+		else
+		{
+			cout << "Invalid socket binding: " << starnet::getErrorMessage() << endl;
+		}
+	}
+	else
+	{
+		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
+	}
+}
+
+void client_main_udp()
 {
 	UDPSocket sock({ Address::localAddress, 9000 });
 	if (sock.isValid())
@@ -80,6 +120,32 @@ void client_main()
 		else
 		{
 			cout << "Invalid socket binding: " << starnet::getErrorMessage() << endl;
+		}
+	}
+	else
+	{
+		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
+	}
+}
+
+void client_main_tcp()
+{
+	TCPSocket sock({ Address::localAddress, 9000 });
+	if (sock.isValid())
+	{
+		if (sock.connect({ Address::localAddress, 9706 }))
+		{
+			cout << "Socket connected successfully!" << endl;
+			std::string message{};
+			if (sock.receive(message))
+			{
+				cout << "Message: " << message << endl;
+			}
+			else cout << "Unable to receive a message" << endl;
+		}
+		else
+		{
+			cout << "Invalid socket connection: " << starnet::getErrorMessage() << endl;
 		}
 	}
 	else
