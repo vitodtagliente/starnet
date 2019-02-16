@@ -1,6 +1,8 @@
 #pragma once
 
-#ifdef WIN32
+#include "platform.h"
+
+#ifdef PLATFORM_WINDOWS
 
 #pragma comment(lib, "ws2_32.lib")
 #include <WinSock2.h>
@@ -12,5 +14,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 #endif

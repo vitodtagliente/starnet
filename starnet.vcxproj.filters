@@ -30,7 +30,10 @@
     <ClInclude Include="error.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="net_address.h">
+    <ClInclude Include="platform.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="address.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

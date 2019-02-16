@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "error.h"
-#include "net_address.h"
+#include "address.h"
 
 namespace starnet
 {
@@ -39,12 +39,12 @@ namespace starnet
 			Both = SD_BOTH
 		};
 
-		Socket(const NetAddress& address, const TransportProtocol protocol = TransportProtocol::UDP)
+		Socket(const Address& address, const TransportProtocol protocol = TransportProtocol::UDP)
 			: m_address{ address }, m_protocol{ protocol }
 		{
 			m_socket = ::socket(
 				// address family / network layer protocol
-				m_address.protocol,
+				m_address.getProtocol(),
 				// type of socket
 				(m_protocol == TransportProtocol::UDP) ? Type::Datagram : Type::Stream,
 				// if 0, OS pick the default implemented transport protocol for the given socket type
@@ -59,11 +59,11 @@ namespace starnet
 
 		inline NativeSocketType getNativeSocket() const { return m_socket; }
 		inline TransportProtocol getTransportProtocol() const { return m_protocol; }
-		inline const NetAddress& getAddress() const { return m_address; }
+		inline const Address& getAddress() const { return m_address; }
 
 		inline bool isValid() const 
 		{ 
-#if WIN32
+#if PLATFORM_WINDOWS
 			return m_socket != INVALID_SOCKET;
 #else
 			return m_socket > 0;
@@ -75,13 +75,16 @@ namespace starnet
 		
 		inline bool bind()
 		{
-			const NetAddress::NativeAddressType& sock_address = m_address.getNativeAddress();
-			return ::bind(m_socket, &sock_address, sizeof(sock_address)) >= 0;
+			return ::bind(m_socket, &m_address.getAddress(), m_address.getSize()) >= 0;
 		}
 
 		inline bool close() 
 		{
+#if PLATFORM_WINDOWS
 			return ::closesocket(m_socket);
+#else
+			return ::close(m_socket);
+#endif			
 		}
 
 		inline bool shutdown(ShutdownMode mode = ShutdownMode::Send)
@@ -89,12 +92,12 @@ namespace starnet
 			return ::shutdown(m_socket, mode) == 0;
 		}
 
-	private:
+	protected:
 
 		// native socket data
 		NativeSocketType m_socket;
 		// nework address 
-		NetAddress m_address;
+		Address m_address;
 		// transport layer protocol
 		TransportProtocol m_protocol;
 	};
@@ -103,40 +106,53 @@ namespace starnet
 	{
 	public:
 
-		UDPSocket(const NetAddress& address)
+		UDPSocket(const Address& address)
 			: Socket(address, TransportProtocol::UDP)
 		{
 
 		}
 
-		inline bool send(const std::string& data, const NetAddress& other) const
+		inline bool send(const std::string& data, const Address& toAddress) const
 		{
-			const NetAddress::NativeAddressType& addr_out = other.getNativeAddress();
-			return ::sendto(getNativeSocket(), data.c_str(), data.length(), 0, &addr_out, sizeof(addr_out));
+			return ::sendto(
+				m_socket, 
+				data.c_str(),
+				data.length(), 
+				0, 
+				&toAddress.getAddress(), 
+				toAddress.getSize()
+			);
 		}
 
-		inline bool receive(std::string& out, const NetAddress& other) const 
+		inline bool receive(std::string& message, Address& fromAddress) const 
 		{
-			NetAddress::NativeAddressType addr_out = other.getNativeAddress();
-			int size = sizeof(addr_out);
+			Address::NativeAddressType address{};
+			int size = sizeof(address);
+
+			// #todo: buffer size 
 			char buffer[100];
-			int bytecount = ::recvfrom(
-				getNativeSocket(),
+			if (const int bytecount = ::recvfrom(
+				m_socket,
 				buffer,
 				sizeof(buffer),
 				0,
-				&(addr_out),
+				&address,
 				&size
-			);
-			out = std::string{ buffer };
-			return bytecount >= 0;
+			))
+			{
+				message = { buffer, (unsigned int)bytecount };
+				fromAddress = { address, m_address.getProtocol() };
+				return true;
+			}
+			// error
+			return false;
 		}
 
 	};
 
 	class TCPSocket : public Socket
 	{
-		TCPSocket(const NetAddress& address)
+		TCPSocket(const Address& address)
 			: Socket(address, TransportProtocol::TCP)
 		{
 

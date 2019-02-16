@@ -35,7 +35,7 @@ int main()
 
 void server_main()
 {
-	UDPSocket sock({ NetAddress::localAddress, 9706 });
+	UDPSocket sock({ Address::localAddress, 9706 });
 	if (sock.isValid())
 	{
 		if (sock.bind())
@@ -44,7 +44,7 @@ void server_main()
 			cout << "Press to send a message...";
 			int response;
 			cin >> response;
-			if (sock.send("ciao mondo", { NetAddress::localAddress, 9000 }))
+			if (sock.send("ciao mondo", { Address::localAddress, 9000 }))
 			{
 				cout << "Message sent!" << endl;
 			}
@@ -63,14 +63,15 @@ void server_main()
 
 void client_main()
 {
-	UDPSocket sock({ NetAddress::localAddress, 9000 });
+	UDPSocket sock({ Address::localAddress, 9000 });
 	if (sock.isValid())
 	{
 		if (sock.bind())
 		{
 			cout << "Socket binded successfully!" << endl;
 			std::string message{};
-			if (sock.receive(message, { NetAddress::localAddress, 9706 }))
+			Address fromAddress{};
+			if (sock.receive(message, fromAddress))
 			{
 				cout << "Message: " << message << endl;
 			}

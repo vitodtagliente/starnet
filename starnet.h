@@ -2,7 +2,6 @@
 
 #include "common.h"
 #include "error.h"
-#include "net_address.h"
 #include "socket.h"
 
 namespace starnet
