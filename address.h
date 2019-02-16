@@ -53,8 +53,8 @@ namespace starnet
 		}
 		
 		inline NetworkProtocol getProtocol() const { return m_protocol; }
-		inline const NativeAddressType& getAddress() const { return m_address; }
-		inline size_t getSize() const { return sizeof(m_address); }
+		inline const NativeAddressType& getNativeAddress() const { return m_address; }
+		inline size_t getNativeSize() const { return sizeof(m_address); }
 
 		static const std::string localAddress;
 		static const PortType unusedPort;

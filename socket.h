@@ -52,6 +52,11 @@ namespace starnet
 			);
 		}
 
+		Socket(const NativeSocketType socket, const Address& address, const TransportProtocol protocol = TransportProtocol::UDP)
+			: m_socket{ socket }, m_address{ address }, m_protocol{ protocol }
+		{
+
+		}
 		Socket(const Socket&) = delete;
 		Socket& operator= (const Socket&) = delete;
 
@@ -63,11 +68,11 @@ namespace starnet
 
 		inline bool isValid() const 
 		{ 
-#if PLATFORM_WINDOWS
-			return m_socket != INVALID_SOCKET;
-#else
-			return m_socket > 0;
-#endif
+	#if PLATFORM_WINDOWS
+				return m_socket != INVALID_SOCKET;
+	#else
+				return m_socket > 0;
+	#endif
 		}
 
 		bool operator== (const Socket& other) const { return m_socket == other.m_socket; }
@@ -75,7 +80,7 @@ namespace starnet
 		
 		inline bool bind()
 		{
-			return ::bind(m_socket, &m_address.getAddress(), m_address.getSize()) >= 0;
+			return ::bind(m_socket, &m_address.getNativeAddress(), m_address.getNativeSize()) >= 0;
 		}
 
 		inline bool close() 
@@ -102,12 +107,18 @@ namespace starnet
 		TransportProtocol m_protocol;
 	};
 
-	class UDPSocket : public Socket
+	class UDPSocket final : public Socket
 	{
 	public:
 
 		UDPSocket(const Address& address)
 			: Socket(address, TransportProtocol::UDP)
+		{
+
+		}
+
+		UDPSocket(const NativeSocketType socket, const Address& address)
+			: Socket(socket, address, TransportProtocol::UDP)
 		{
 
 		}
@@ -119,9 +130,9 @@ namespace starnet
 				data.c_str(),
 				data.length(), 
 				0, 
-				&toAddress.getAddress(), 
-				toAddress.getSize()
-			);
+				&toAddress.getNativeAddress(), 
+				toAddress.getNativeSize()
+			) >= 0;
 		}
 
 		inline bool receive(std::string& message, Address& fromAddress) const 
@@ -150,14 +161,81 @@ namespace starnet
 
 	};
 
-	class TCPSocket : public Socket
+	class TCPSocket final : public Socket
 	{
+	public:
+
 		TCPSocket(const Address& address)
 			: Socket(address, TransportProtocol::TCP)
 		{
 
 		}
 
+		TCPSocket(const NativeSocketType socket, const Address& address)
+			: Socket(socket, address, TransportProtocol::TCP)
+		{
 
+		}
+
+		// calling connect initialized the TCP handshake by sending 
+		// the initial SYN packet to a target host.
+		// if the host has a listen socket bound to the appropriate port, 
+		// it can proceed with the handshake by calling accept.
+		inline bool connect(const Address& address)
+		{
+			return ::connect(m_socket, &address.getNativeAddress(), address.getNativeSize()) == 0;
+		}
+
+		// numOfMaxConnections is the maximum number of incoming 
+		// connections that should be allowed to queue up.
+		// Once the maximum number of handshakes are pending, 
+		// any futher incoming connection is dropped.
+		inline bool listen(unsigned int numOfMaxConnections = SOMAXCONN)
+		{
+			return ::listen(m_socket, numOfMaxConnections) == 0;
+		}
+
+		// accept an incoming connection and continue to the TCP handshake.
+		inline TCPSocket* accept() const
+		{
+			Address::NativeAddressType address{};
+			int size = sizeof(address);
+
+			NativeSocketType newSocket = ::accept(
+				m_socket,
+				&address,
+				&size
+			);
+
+			if (newSocket > 0)
+			{
+				return new TCPSocket(newSocket, { address, m_address.getProtocol() });
+			}
+			return nullptr;
+		}
+
+		inline bool send(const std::string& message)
+		{
+			
+			return false;
+		}
+
+		inline bool send(const Socket& socket, const std::string& message)
+		{
+
+			return false;
+		}
+
+		inline bool receive(std::string& message) const
+		{
+
+			return false;
+		}
+
+		inline bool receive(const Socket& socket, std::string& message) const
+		{
+
+			return false;
+		}
 	};
 }
