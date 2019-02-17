@@ -16,7 +16,7 @@ int main()
 	starnet::startup();
 
 	int choice = 0;
-	cout << "UDP Chat [0: Server, 1: Client]: ";
+	cout << "TCP Chat [0: Server, 1: Client]: ";
 	cin >> choice;
 
 	if (choice == 0)
