@@ -13,8 +13,10 @@ void server_main();
 
 int main()
 {
+	starnet::startup();
+
 	int choice = 0;
-	cout << "TCP Chat [0: Server, 1: Client]: ";
+	cout << "UDP Chat [0: Server, 1: Client]: ";
 	cin >> choice;
 
 	if (choice == 0)
@@ -23,6 +25,8 @@ int main()
 
 	cout << "Premi un tasto per continuare...";
 	_getch();
+
+	starnet::shutdown();
 
 	return 0;
 }
