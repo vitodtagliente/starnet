@@ -32,9 +32,7 @@ namespace starnet
 			addr_in->sin_family = protocol;
 			addr_in->sin_port = htons(port);
 #if PLATFORM_WINDOWS
-			InetPton(protocol,
-				std::wstring{ address.begin(), address.end() }.c_str(),
-				&addr_in->sin_addr);
+			InetPton(protocol, address.c_str(), &addr_in->sin_addr);
 #else
 			inet_pton(protocol, address.c_str(), &addr_in->sin_addr);
 #endif

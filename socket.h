@@ -3,6 +3,7 @@
 #include "common.h"
 #include "error.h"
 #include "address.h"
+#include <vector>
 
 namespace starnet
 {
@@ -127,11 +128,6 @@ namespace starnet
 			flags = active ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
 			return fcntl(m_socket, F_SETFL, flags) != SOCKET_ERROR;
 #endif
-		}
-		
-		inline static void select()
-		{
-
 		}
 
 	protected:
