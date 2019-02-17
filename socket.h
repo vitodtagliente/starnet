@@ -60,7 +60,11 @@ namespace starnet
 		Socket(const Socket&) = delete;
 		Socket& operator= (const Socket&) = delete;
 
-		virtual ~Socket() = default;
+		virtual ~Socket()
+		{
+			if (isValid())
+				close();
+		}
 
 		inline NativeSocketType getNativeSocket() const { return m_socket; }
 		inline TransportProtocol getTransportProtocol() const { return m_protocol; }
@@ -78,23 +82,56 @@ namespace starnet
 		bool operator== (const Socket& other) const { return m_socket == other.m_socket; }
 		bool operator!= (const Socket& other) const { return !(*this == other); }
 		
+		// Notify the operating system that a socket will use a specific address
+		// and transport layer port.
 		inline bool bind()
 		{
 			return ::bind(m_socket, &m_address.getNativeAddress(), m_address.getNativeSize()) >= 0;
 		}
 
+		// Close the socket
 		inline bool close() 
 		{
 #if PLATFORM_WINDOWS
-			return ::closesocket(m_socket);
+			if (::closesocket(m_socket) == 0)
+			{
+				m_socket = INVALID_SOCKET;
+				return true;
+			}
 #else
-			return ::close(m_socket);
+			if (::close(m_socket) == 0)
+			{
+				m_socket = 0;
+				return true;
+			}
 #endif			
+			return false;
 		}
 
+		// Use to cease transmitting or receiving before closing the socket
 		inline bool shutdown(ShutdownMode mode = ShutdownMode::Send)
 		{
 			return ::shutdown(m_socket, mode) == 0;
+		}
+
+		inline bool setNonBlockingMode(const bool active)
+		{
+#if PLATFORM_WINDOWS
+			// Any nonzero value will enable non-blocking mode
+			u_long arg = active ? 1 : 0;
+			return ioctlsocket(m_socket, FIONBIO, &arg) != SOCKET_ERROR;
+#else 
+			// First need to fetch the flags currently associated with the socket,
+			// bitwise them with the constant O_NONBLOCK and update the flags on the socket.
+			int flags = fcntl(m_socket, F_GETFL, 0);
+			flags = active ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
+			return fcntl(m_socket, F_SETFL, flags) != SOCKET_ERROR;
+#endif
+		}
+		
+		inline static void select()
+		{
+
 		}
 
 	protected:
@@ -123,6 +160,7 @@ namespace starnet
 
 		}
 
+		// Send data to a specific address
 		inline bool send(const std::string& data, const Address& toAddress) const
 		{
 			return ::sendto(
@@ -135,7 +173,8 @@ namespace starnet
 			) >= 0;
 		}
 
-		inline bool receive(std::string& message, Address& fromAddress) const 
+		// Receiving data from a specific address
+		inline bool receive(std::string& data, Address& fromAddress) const
 		{
 			Address::NativeAddressType address{};
 			int size = sizeof(address);
@@ -152,13 +191,12 @@ namespace starnet
 			);
 			if (bytecount >= 0)
 			{
-				message = { buffer, (unsigned int)bytecount };
+				data = { buffer, (unsigned int)bytecount };
 				fromAddress = { address, m_address.getProtocol() };
 				return true;
 			}
 			return false;
 		}
-
 	};
 
 	class TCPSocket final : public Socket
@@ -177,7 +215,7 @@ namespace starnet
 
 		}
 
-		// calling connect initialized the TCP handshake by sending 
+		// Calling connect initialized the TCP handshake by sending 
 		// the initial SYN packet to a target host.
 		// if the host has a listen socket bound to the appropriate port, 
 		// it can proceed with the handshake by calling accept.
@@ -214,14 +252,17 @@ namespace starnet
 			return nullptr;
 		}
 
-		inline bool send(const std::string& message)
+		// A connected TCP socket stores the remote host's address informaztion.
+		// Because of this, a process does not need to pass an address. 
+		inline bool send(const std::string& data)
 		{
 			// note that a nonzero return value does not imply any data
 			// was sent, just that data was queued to be sent.
-			return ::send(m_socket, message.c_str(), message.length(), 0) >= 0;
+			return ::send(m_socket, data.c_str(), data.length(), 0) >= 0;
 		}
 		
-		inline bool receive(std::string& message) const
+		// Receive data con a connected TCP socket.
+		inline bool receive(std::string& data) const
 		{
 			// #todo: buffer size 
 			char buffer[100];
@@ -233,7 +274,7 @@ namespace starnet
 			);
 			if (bytecount >= 0)
 			{
-				message = { buffer, (unsigned int)bytecount };
+				data = { buffer, (unsigned int)bytecount };
 				return true;
 			}
 			return false;

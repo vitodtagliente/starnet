@@ -25,8 +25,8 @@ int main()
 	if (starnet::startup())
 	{
 		if (choice == 0)
-			server_main_tcp();
-		else client_main_tcp();
+			server_main_udp();
+		else client_main_udp();
 
 		starnet::shutdown();
 	}	
