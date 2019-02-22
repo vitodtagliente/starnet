@@ -3,6 +3,8 @@
 #include "common.h"
 #include "error.h"
 #include "socket.h"
+#include "memory_stream.h"
+#include "bit_stream.h"
 
 namespace starnet
 {

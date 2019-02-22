@@ -71,8 +71,7 @@ void server_main()
 				if (TCPSocket* clientSocket = sock.accept())
 				{
 					cout << "Press to send a message...";
-					int response;
-					cin >> response;
+					_getch();
 					if (clientSocket->send("ciao mondo"))
 					{
 						cout << "Message sent!" << endl;
