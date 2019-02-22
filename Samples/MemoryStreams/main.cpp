@@ -34,6 +34,8 @@ int main()
 	os << 4.12f;
 	os << FooType::Prova;
 	os << FVector{ 1, 5 };
+
+	InputMemoryStream is;
 	
 	cout << "Premi un tasto per continuare...";
 	_getch();

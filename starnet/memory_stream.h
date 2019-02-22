@@ -47,14 +47,31 @@ namespace starnet
 	{
 	public:
 
-		InputMemoryStream()
+		InputMemoryStream() : m_index{}
 		{
 
 		}
 
+		template<typename T>
+		InputMemoryStream& operator>> (T& data) const
+		{
+			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
+				"Generic read only supports primitive data type");
+
+			static_assert(sizeof(T) <= m_buffer.size() - m_index,
+				"Generic read overflow");
+
+
+			m_index += sizeof(T);
+
+			return *this;
+		}
+		
 	private:
 
 		// buffer of bytes
 		ByteBuffer m_buffer;
+		// reading byte index
+		uint32_t m_index;
 	};
 }
