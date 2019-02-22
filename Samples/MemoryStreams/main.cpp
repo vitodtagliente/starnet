@@ -25,17 +25,30 @@ OutputMemoryStream& operator<< (OutputMemoryStream& stream, const FVector& vecto
 	return stream;
 }
 
+InputMemoryStream& operator>> (InputMemoryStream& stream, const FVector& vector)
+{
+	//stream >> vector.x;
+	//stream >> vector.y;
+	return stream;
+}
+
 int main()
 {
 	OutputMemoryStream os;
 	os << 13;
 	os << (uint8_t)2;
+	os << FVector{ 1, 5 };
 	os << 's';
 	os << 4.12f;
 	os << FooType::Prova;
-	os << FVector{ 1, 5 };
 
-	InputMemoryStream is;
+	InputMemoryStream is{ os.getBuffer() };
+	int number;
+	is >> number;
+	uint8_t n2;
+	is >> n2;
+	FVector f{};
+	//is >> f;
 	
 	cout << "Premi un tasto per continuare...";
 	_getch();

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -47,21 +48,18 @@ namespace starnet
 	{
 	public:
 
-		InputMemoryStream() : m_index{}
+		InputMemoryStream(const ByteBuffer& buffer) : m_buffer{buffer}, m_index {}
 		{
 
 		}
 
 		template<typename T>
-		InputMemoryStream& operator>> (T& data) const
+		InputMemoryStream& operator>> (T& data)
 		{
 			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
 				"Generic read only supports primitive data type");
-
-			static_assert(sizeof(T) <= m_buffer.size() - m_index,
-				"Generic read overflow");
-
-
+						
+			std::memcpy(&data, reinterpret_cast<const T*>(&m_buffer[m_index]), sizeof(T));
 			m_index += sizeof(T);
 
 			return *this;
