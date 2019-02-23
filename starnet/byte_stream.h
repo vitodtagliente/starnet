@@ -12,12 +12,12 @@ namespace starnet
 {
 	typedef std::vector<std::byte> ByteBuffer;
 
-	class MemoryStream
+	class ByteStream
 	{
 	public:
 
-		MemoryStream() : m_buffer{} {}
-		MemoryStream(const ByteBuffer& buffer) : m_buffer{ buffer } {}
+		ByteStream() : m_buffer{} {}
+		ByteStream(const ByteBuffer& buffer) : m_buffer{ buffer } {}
 
 		inline const ByteBuffer& getBuffer() const { return m_buffer; }
 		inline const std::byte* getNativeBuffer() const { return m_buffer.data(); }
@@ -28,14 +28,14 @@ namespace starnet
 		ByteBuffer m_buffer;
 	};
 
-	class OutputMemoryStream : public MemoryStream
+	class OutputByteStream : public ByteStream
 	{
 	public:
 
-		OutputMemoryStream() : MemoryStream{} {}
+		OutputByteStream() : ByteStream{} {}
 
 		template<typename T>
-		OutputMemoryStream& operator<< (const T data)
+		OutputByteStream& operator<< (const T data)
 		{
 			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
 				"Generic write only supports primitive data type");
@@ -49,17 +49,17 @@ namespace starnet
 		}		
 	};
 
-	class InputMemoryStream : public MemoryStream
+	class InputByteStream : public ByteStream
 	{
 	public:
 
-		InputMemoryStream(const ByteBuffer& buffer) : MemoryStream{ buffer }, m_index{ 0 }
+		InputByteStream(const ByteBuffer& buffer) : ByteStream{ buffer }, m_index{ 0 }
 		{
 
 		}
 
 		template<typename T>
-		InputMemoryStream& operator>> (T& data)
+		InputByteStream& operator>> (T& data)
 		{
 			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
 				"Generic read only supports primitive data type");

@@ -18,14 +18,14 @@ struct FVector
 	int y;
 };
 
-OutputMemoryStream& operator<< (OutputMemoryStream& stream, const FVector& vector)
+OutputByteStream& operator<< (OutputByteStream& stream, const FVector& vector)
 {
 	stream << vector.x;
 	stream << vector.y;
 	return stream;
 }
 
-InputMemoryStream& operator>> (InputMemoryStream& stream, FVector& vector)
+InputByteStream& operator>> (InputByteStream& stream, FVector& vector)
 {
 	stream >> vector.x;
 	stream >> vector.y;
@@ -34,7 +34,7 @@ InputMemoryStream& operator>> (InputMemoryStream& stream, FVector& vector)
 
 int main()
 {
-	OutputMemoryStream os;
+	OutputByteStream os;
 	os << 13;
 	os << (uint8_t)2;
 	os << FVector{ 1, 5 };
@@ -42,7 +42,7 @@ int main()
 	os << 4.12f;
 	os << FooType::Prova;
 
-	InputMemoryStream is{ os.getBuffer() };
+	InputByteStream is{ os.getBuffer() };
 	int number;
 	is >> number;
 	uint8_t n2;
