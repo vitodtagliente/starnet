@@ -28,6 +28,9 @@ namespace starnet
 		ByteBuffer m_buffer;
 	};
 
+	// The OutputByteBuffer wraps the ByteBuffer.
+	// It has methods for writing sequentially into the buffer.
+
 	class OutputByteStream : public ByteStream
 	{
 	public:
@@ -48,6 +51,8 @@ namespace starnet
 			return *this;
 		}		
 	};
+
+	// The InputByteStream has methods for reading sequentially from the buffer. 
 
 	class InputByteStream : public ByteStream
 	{

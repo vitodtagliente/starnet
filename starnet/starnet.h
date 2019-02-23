@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "little_endian.h"
 #include "error.h"
 #include "socket.h"
 #include "byte_stream.h"
