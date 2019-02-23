@@ -35,9 +35,15 @@ namespace starnet
 
 		enum ShutdownMode
 		{
+#if PLATFORM_WINDOWS
 			Send = SD_SEND,
 			Receive = SD_RECEIVE,
 			Both = SD_BOTH
+#else 
+			Send = SHUT_WR,
+			Receive = SHUT_RD,
+			Both = SHUT_RDWR
+#endif
 		};
 
 		Socket(const Address& address, const TransportProtocol protocol = TransportProtocol::UDP)
@@ -126,7 +132,7 @@ namespace starnet
 			// bitwise them with the constant O_NONBLOCK and update the flags on the socket.
 			int flags = fcntl(m_socket, F_GETFL, 0);
 			flags = active ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK);
-			return fcntl(m_socket, F_SETFL, flags) != SOCKET_ERROR;
+			return fcntl(m_socket, F_SETFL, flags) != -1;
 #endif
 		}
 
@@ -173,7 +179,7 @@ namespace starnet
 		inline bool receive(std::string& data, Address& fromAddress) const
 		{
 			Address::NativeAddressType address{};
-			int size = sizeof(address);
+			unsigned int size = sizeof(address);
 
 			// #todo: buffer size 
 			char buffer[100];
@@ -233,7 +239,7 @@ namespace starnet
 		inline TCPSocket* accept() const
 		{
 			Address::NativeAddressType address{};
-			int size = sizeof(address);
+			unsigned int size = sizeof(address);
 
 			NativeSocketType newSocket = ::accept(
 				m_socket,

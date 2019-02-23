@@ -1,4 +1,3 @@
-#include <conio.h>
 #include <iostream>
 #include <starnet/starnet.h>
 
@@ -51,7 +50,7 @@ int main()
 	is >> f;
 	
 	cout << "Premi un tasto per continuare...";
-	_getch();
+	getchar();
 
 	return 0;
 }

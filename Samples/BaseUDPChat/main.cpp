@@ -1,4 +1,3 @@
-#include <conio.h>
 #include <iostream>
 #include <starnet/starnet.h>
 
@@ -24,7 +23,7 @@ int main()
 	else client_main();
 
 	cout << "Premi un tasto per continuare...";
-	_getch();
+	getchar();
 
 	starnet::shutdown();
 
@@ -67,7 +66,7 @@ void server_main()
 		{
 			cout << "Socket binded successfully!" << endl;
 			cout << "Press to send a message...";
-			_getch();
+			getchar();
 			if (sock.send("ciao mondo", { Address::localAddress, CLIENT_PORT }))
 			{
 				cout << "Message sent!" << endl;

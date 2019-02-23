@@ -15,5 +15,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #endif

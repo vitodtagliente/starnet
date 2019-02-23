@@ -20,7 +20,7 @@ namespace starnet
 #if WIN32
 		strerror_s(buffer, bufferSize, WSAGetLastError());
 #else 
-		strerror_s(buffer, bufferSize, error_id);
+		//strerror_s(buffer, bufferSize, errno);
 #endif
 		return std::string{ buffer };
 	}
