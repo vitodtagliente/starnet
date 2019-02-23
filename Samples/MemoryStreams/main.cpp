@@ -25,10 +25,10 @@ OutputMemoryStream& operator<< (OutputMemoryStream& stream, const FVector& vecto
 	return stream;
 }
 
-InputMemoryStream& operator>> (InputMemoryStream& stream, const FVector& vector)
+InputMemoryStream& operator>> (InputMemoryStream& stream, FVector& vector)
 {
-	//stream >> vector.x;
-	//stream >> vector.y;
+	stream >> vector.x;
+	stream >> vector.y;
 	return stream;
 }
 
@@ -48,7 +48,7 @@ int main()
 	uint8_t n2;
 	is >> n2;
 	FVector f{};
-	//is >> f;
+	is >> f;
 	
 	cout << "Premi un tasto per continuare...";
 	_getch();

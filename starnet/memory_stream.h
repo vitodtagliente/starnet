@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -11,21 +12,30 @@ namespace starnet
 {
 	typedef std::vector<std::byte> ByteBuffer;
 
-	class OutputMemoryStream
+	class MemoryStream
 	{
 	public:
 
-		OutputMemoryStream() : m_buffer{}
-		{
-
-		}
+		MemoryStream() : m_buffer{} {}
+		MemoryStream(const ByteBuffer& buffer) : m_buffer{ buffer } {}
 
 		inline const ByteBuffer& getBuffer() const { return m_buffer; }
 		inline const std::byte* getNativeBuffer() const { return m_buffer.data(); }
-		inline const size_t& getSize() const { return m_buffer.size(); }
+
+	protected:
+
+		// buffer of bytes
+		ByteBuffer m_buffer;
+	};
+
+	class OutputMemoryStream : public MemoryStream
+	{
+	public:
+
+		OutputMemoryStream() : MemoryStream{} {}
 
 		template<typename T>
-		OutputMemoryStream& operator<< (T data)
+		OutputMemoryStream& operator<< (const T data)
 		{
 			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
 				"Generic write only supports primitive data type");
@@ -36,19 +46,14 @@ namespace starnet
 			m_buffer.insert(m_buffer.end(), begin, end);
 
 			return *this;
-		}
-
-	private:
-				
-		// buffer of bytes
-		ByteBuffer m_buffer;
+		}		
 	};
 
-	class InputMemoryStream
+	class InputMemoryStream : public MemoryStream
 	{
 	public:
 
-		InputMemoryStream(const ByteBuffer& buffer) : m_buffer{buffer}, m_index {}
+		InputMemoryStream(const ByteBuffer& buffer) : MemoryStream{ buffer }, m_index{ 0 }
 		{
 
 		}
@@ -58,17 +63,21 @@ namespace starnet
 		{
 			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
 				"Generic read only supports primitive data type");
-						
-			std::memcpy(&data, reinterpret_cast<const T*>(&m_buffer[m_index]), sizeof(T));
-			m_index += sizeof(T);
+
+			const std::size_t amount = std::min<std::size_t>(sizeof(T), getSize());
+			if (amount > 0)
+			{
+				std::memcpy(&data, &m_buffer[m_index], amount);
+				m_index += amount;
+			}
 
 			return *this;
 		}
+
+		inline std::size_t getSize() const { return m_buffer.size() - m_index; }
 		
 	private:
 
-		// buffer of bytes
-		ByteBuffer m_buffer;
 		// reading byte index
 		uint32_t m_index;
 	};
