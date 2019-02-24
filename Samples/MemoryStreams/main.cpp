@@ -48,6 +48,12 @@ int main()
 	is >> n2;
 	FVector f{};
 	is >> f;
+
+	OutputBitStream obs;
+	obs.write((uint8_t)5, 3);
+	cout << obs.out() << endl;
+	obs.write((uint8_t)4, 2);
+	cout << obs.out() << endl;
 	
 	cout << "Premi un tasto per continuare...";
 	getchar();

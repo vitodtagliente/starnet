@@ -179,7 +179,11 @@ namespace starnet
 		inline bool receive(std::string& data, Address& fromAddress) const
 		{
 			Address::NativeAddressType address{};
+#if PLATFORM_WINDOWS
+			int size = sizeof(address);
+#else 
 			unsigned int size = sizeof(address);
+#endif
 
 			// #todo: buffer size 
 			char buffer[100];
@@ -239,7 +243,11 @@ namespace starnet
 		inline TCPSocket* accept() const
 		{
 			Address::NativeAddressType address{};
+#if PLATFORM_WINDOWS
+			int size = sizeof(address);
+#else 
 			unsigned int size = sizeof(address);
+#endif
 
 			NativeSocketType newSocket = ::accept(
 				m_socket,

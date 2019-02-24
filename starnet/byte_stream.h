@@ -36,7 +36,7 @@ namespace starnet
 	{
 	public:
 
-		OutputByteStream() : ByteStream{} {}
+		OutputByteStream() : ByteStream() {}
 
 		template<typename T>
 		OutputByteStream& operator<< (const T data)
@@ -59,7 +59,7 @@ namespace starnet
 	{
 	public:
 
-		InputByteStream(const ByteBuffer& buffer) : ByteStream{ buffer }, m_index{ 0 }
+		InputByteStream(const ByteBuffer& buffer) : ByteStream(buffer), m_index{ 0 }
 		{
 
 		}
