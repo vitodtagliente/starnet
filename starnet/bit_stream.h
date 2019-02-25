@@ -69,11 +69,6 @@ namespace starnet
 				}
 			}
 		}
-
-		int out()
-		{
-			return (int)(m_buffer[m_byteIndex]);
-		}
 	};
 
 	class InputBitStream : public BitStream
@@ -81,5 +76,41 @@ namespace starnet
 	public:
 
 		InputBitStream(const ByteBuffer& buffer) : BitStream(buffer) {}
+
+		template<typename T>
+		void read(T& data, const std::size_t bits = sizeof(T) * 8)
+		{
+			static constexpr uint8_t bits_per_byte = sizeof(std::byte) * 8;
+
+			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
+				"Generic read only supports primitive data type");
+
+			if (m_offset == bits_per_byte)
+			{
+				++m_byteIndex;
+				m_offset = 0;
+			}
+			if (true) // amount of bits
+			{
+				if (bits + m_offset <= bits_per_byte)
+				{
+					const uint8_t amount = bits_per_byte - (uint8_t)bits;
+					std::byte in_data = (m_buffer[m_byteIndex] << amount) >> amount;
+					std::memcpy(&data, &in_data, sizeof(std::byte));
+					m_offset += (uint8_t)bits;
+				}
+				else
+				{
+					data = m_buffer[m_byteIndex] >> m_offset;
+
+					uint32_t bitsFreeThisByte = 8 - m_offset;
+					if (bitsFreeThisByte < bits)
+					{
+						//we need another byte
+						data |= m_buffer[m_byteIndex + 1] << bitsFreeThisByte;
+					}
+				}
+			}
+		}
 	};
 }

@@ -52,9 +52,11 @@ int main()
 	// 5: 101
 	OutputBitStream obs;
 	obs.write((uint8_t)5, 7);
-	cout << obs.out() << endl;
 	obs.write(5);
-	cout << obs.out() << endl;
+
+	InputBitStream ibs(obs.getBuffer());
+	ibs.read(number, 6);
+	cout << number << endl;
 	
 	cout << "Premi un tasto per continuare...";
 	getchar();
