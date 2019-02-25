@@ -49,10 +49,11 @@ int main()
 	FVector f{};
 	is >> f;
 
+	// 5: 101
 	OutputBitStream obs;
-	obs.write((uint8_t)5, 3);
+	obs.write((uint8_t)5, 7);
 	cout << obs.out() << endl;
-	obs.write((uint8_t)4, 2);
+	obs.write(5);
 	cout << obs.out() << endl;
 	
 	cout << "Premi un tasto per continuare...";

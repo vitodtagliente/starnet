@@ -43,17 +43,30 @@ namespace starnet
 				++m_byteIndex;
 				m_offset = 0;
 			}
-
 			if (bits + m_offset <= bits_per_byte)
 			{
 				// make sure to write only n defined bits
-				const uint8_t amount = bits_per_byte - bits;
+				const uint8_t amount = bits_per_byte - (uint8_t)bits;
 				std::byte data_to_write = (std::byte(data) << amount) >> amount;
 				m_buffer[m_byteIndex] |= data_to_write << m_offset;
 				m_offset += (uint8_t)bits;			
 			}
 			else
 			{
+				const std::byte* begin = reinterpret_cast<const std::byte*>(std::addressof(data));
+				const std::byte* end = begin + sizeof(T);
+
+				for (auto it = begin; it != end; ++it)
+				{
+					m_buffer[m_byteIndex] |= (*it << m_offset);
+					m_buffer.push_back({});
+					++m_byteIndex;
+					if (m_offset != 0)
+					{
+						const uint8_t amount = bits_per_byte - m_offset;
+						m_buffer[m_byteIndex] |= (*it >> amount);
+					}						
+				}
 			}
 		}
 
