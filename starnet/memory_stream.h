@@ -21,7 +21,7 @@ namespace starnet
 		~MemoryStream() = default;
 
 		inline const MemoryBuffer& getBuffer() const { return m_buffer; }
-		inline const uint32_t* getNativeBuffer() const { return m_buffer.data(); }
+		inline const uint32_t* getData() const { return m_buffer.data(); }
 
 		inline std::size_t getSize() const { return m_buffer.size(); }
 		inline const uint32_t& getBitSize() const { return m_bitSize; }
@@ -60,7 +60,7 @@ namespace starnet
 				if (m_offset >= bits_per_word)
 				{
 					// #todo: endianness
-					m_buffer[m_wordIndex] = (uint32_t)m_scratch;
+					m_buffer[m_wordIndex] = uint32_t(m_scratch);
 					m_scratch >>= bits_per_word;
 					m_buffer.push_back(0);
 					++m_wordIndex;
@@ -71,6 +71,11 @@ namespace starnet
 			{
 
 			}
+		}
+
+		void flush()
+		{
+
 		}
 
 	private:
@@ -84,6 +89,23 @@ namespace starnet
 	{
 	public:
 
-		
+		InputMemoryStream(const MemoryBuffer& buffer) : MemoryStream(buffer) 
+		{
+			m_scratch = m_buffer[m_wordIndex];
+		}
+
+		template<typename T>
+		void read(T& data, const std::size_t bits = sizeof(T) * bits_per_byte)
+		{
+			data = T{ m_scratch & ((uint64_t(1) << bits) - 1) };
+			m_scratch >>= (uint8_t)bits;
+			m_offset += (uint8_t)bits;
+		}
+
+	private:
+		// used to store temporary bits
+		uint64_t m_scratch{ 0 };
+		// scratch bit offset
+		uint8_t m_offset{ 0 };
 	};
 }

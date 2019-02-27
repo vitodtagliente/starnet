@@ -33,40 +33,20 @@ InputByteStream& operator>> (InputByteStream& stream, FVector& vector)
 
 int main()
 {
-	/*
-	OutputByteStream os;
-	os << 13;
-	os << (uint8_t)2;
-	os << FVector{ 1, 5 };
-	os << 's';
-	os << 4.12f;
-	os << FooType::Prova;
-
-	InputByteStream is{ os.getBuffer() };
-	int number;
-	is >> number;
-	uint8_t n2;
-	is >> n2;
-	FVector f{};
-	is >> f;
-
-	// 5: 101
-	OutputBitStream obs;
-	obs.write((uint8_t)5, 7);
-	obs.write(5);
-
-	InputBitStream ibs(obs.getBuffer());
-	ibs.read(number, 6);
-	cout << number << endl;
-	*/
-
+	
 	int number = 0;
 
-	OutputMemoryStream oms;
-	oms.write((uint8_t)5, 7);
-	oms.write((uint32_t)4);
+	OutputMemoryStream os;
+	os.write(5, 3);
+	os.write(4, 3);
+	os.write(0);
 	
-	
+	InputMemoryStream is(os.getBuffer());
+	is.read(number, 3);
+	cout << number << endl;
+	is.read(number, 4);
+	cout << number << endl;
+
 
 	cout << "Premi un tasto per continuare...";
 	getchar();
