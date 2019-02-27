@@ -9,6 +9,8 @@
 #include <memory>
 #include <vector>
 
+#include "memory_stream.h"
+
 namespace starnet
 {
 	typedef std::vector<std::byte> ByteBuffer;

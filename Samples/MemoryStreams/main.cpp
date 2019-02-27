@@ -33,6 +33,7 @@ InputByteStream& operator>> (InputByteStream& stream, FVector& vector)
 
 int main()
 {
+	/*
 	OutputByteStream os;
 	os << 13;
 	os << (uint8_t)2;
@@ -57,7 +58,16 @@ int main()
 	InputBitStream ibs(obs.getBuffer());
 	ibs.read(number, 6);
 	cout << number << endl;
+	*/
+
+	int number = 0;
+
+	OutputMemoryStream oms;
+	oms.write((uint8_t)5, 7);
+	oms.write((uint32_t)4);
 	
+	
+
 	cout << "Premi un tasto per continuare...";
 	getchar();
 

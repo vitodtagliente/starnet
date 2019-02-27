@@ -12,7 +12,16 @@
 	Big-endian:			0x12 0x34 0x56 0x78
 */
 
+#include "common.h"
+
 namespace starnet
 {
+	bool BIG_ENDIAN = (1 == htons(1));
+	bool LITTLE_ENDIAN = !BIG_ENDIAN;
 
+	// swap word from big-endian to little-endian
+	void bswap()
+	{
+				
+	}
 }

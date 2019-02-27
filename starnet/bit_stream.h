@@ -101,14 +101,7 @@ namespace starnet
 				}
 				else
 				{
-					data = m_buffer[m_byteIndex] >> m_offset;
-
-					uint32_t bitsFreeThisByte = 8 - m_offset;
-					if (bitsFreeThisByte < bits)
-					{
-						//we need another byte
-						data |= m_buffer[m_byteIndex + 1] << bitsFreeThisByte;
-					}
+					
 				}
 			}
 		}
