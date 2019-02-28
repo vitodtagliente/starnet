@@ -40,6 +40,7 @@ int main()
 	os.write(5, 3);
 	os.write(4, 3);
 	os.write(0);
+	//os.write((double)8);
 	
 	InputMemoryStream is(os.getBuffer());
 	is.read(number, 3);
@@ -47,6 +48,8 @@ int main()
 	is.read(number, 4);
 	cout << number << endl;
 
+
+	cout << sizeof(float) << " " << sizeof(double) << endl;
 
 	cout << "Premi un tasto per continuare...";
 	getchar();

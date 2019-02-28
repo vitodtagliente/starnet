@@ -48,7 +48,7 @@ namespace starnet
 		OutputMemoryStream(const std::size_t size) : MemoryStream(size) {}
 
 		template<typename T>
-		void write(const T data, const std::size_t bits = sizeof(T) * bits_per_byte)
+		void write(T data, const std::size_t bits = sizeof(T) * bits_per_byte)
 		{
 			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
 				"Generic write only supports primitive data type");
@@ -69,13 +69,28 @@ namespace starnet
 			}
 			else
 			{
+				const std::size_t words_count = bits / bits_per_word;
+				const std::size_t rest_bits = bits % bits_per_word;
 
+				for (std::size_t i = 0; i < words_count; ++i)
+				{
+					write(data, bits_per_word);
+					data >>= bits_per_word;
+				}
+
+				if (rest_bits != 0)
+				{
+					write(data, rest_bits);
+				}
 			}
 		}
 
 		void flush()
 		{
+			if (m_scratch != 0)
+			{
 
+			}
 		}
 
 	private:
