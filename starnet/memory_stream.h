@@ -136,7 +136,7 @@ namespace starnet
 					if (m_wordIndex < getSize() - 1)
 					{
 						++m_wordIndex;
-						m_scratch |= (m_buffer[m_wordIndex] << m_offset);
+						m_scratch |= (uint64_t(m_buffer[m_wordIndex]) << m_offset);
 						m_offset += bits_per_word;
 					}
 					else

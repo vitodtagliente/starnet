@@ -35,13 +35,14 @@ int main()
 {
 	
 	int number = 0;
+	double ff = 0;
 
 	OutputMemoryStream os;
 	os.write(5, 3);
 	os.write(4, 3);
 	os.write((int)9);
+	os.write((double)8);
 	os.write(12, 10);
-	//os.write((double)8);
 	os.flush();
 	
 	InputMemoryStream is(os.getBuffer());
@@ -51,6 +52,8 @@ int main()
 	cout << number << endl;
 	is.read(number);
 	cout << number << endl;
+	is.read(ff);
+	cout << ff << endl;
 	is.read(number, 10);
 	cout << number << endl;
 
