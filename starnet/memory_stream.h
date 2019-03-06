@@ -93,6 +93,28 @@ namespace starnet
 			}
 		}
 
+		template<>
+		void write(double data, const std::size_t bits)
+		{
+			const std::size_t words_count = bits / bits_per_word;
+			const std::size_t rest_bits = bits % bits_per_word;
+
+			const uint32_t* begin = reinterpret_cast<const uint32_t*>(std::addressof(data));
+			const uint32_t* end = begin + words_count;
+
+			const uint32_t* it;
+
+			for (it = begin; it != end; ++it)
+			{
+				write(*it, bits_per_word);
+			}
+
+			if (rest_bits != 0)
+			{
+				write(*(it + 1), rest_bits);
+			}
+		}
+
 		void flush()
 		{
 			if (m_offset > 0)
