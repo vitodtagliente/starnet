@@ -39,17 +39,20 @@ int main()
 	OutputMemoryStream os;
 	os.write(5, 3);
 	os.write(4, 3);
-	os.write(0);
+	os.write((int)9);
+	os.write(12, 10);
 	//os.write((double)8);
+	os.flush();
 	
 	InputMemoryStream is(os.getBuffer());
 	is.read(number, 3);
 	cout << number << endl;
-	is.read(number, 4);
+	is.read(number, 3);
 	cout << number << endl;
-
-
-	cout << sizeof(float) << " " << sizeof(double) << endl;
+	is.read(number);
+	cout << number << endl;
+	is.read(number, 10);
+	cout << number << endl;
 
 	cout << "Premi un tasto per continuare...";
 	getchar();

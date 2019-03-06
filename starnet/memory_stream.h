@@ -1,7 +1,18 @@
 #pragma once 
 
 #include <cstddef>
+#include <memory>
 #include <vector>
+
+/*
+	Many people write bitpackers that work at the byte level. 
+	This means they flush bytes to memory as they are filled. 
+	This is simpler to code, but the ideal is to read and write words at a time, 
+	because modern machines are optimized to work this way instead of farting across a buffer 
+	at byte level like it’s 1985.
+	If you want to write 32 bits at a time, you’ll need a scratch word twice that size, eg. uint64_t,
+	for caching reasons.
+*/
 
 namespace starnet
 {
@@ -12,10 +23,7 @@ namespace starnet
 	public:
 
 		MemoryStream() : m_buffer() {}
-		MemoryStream(const std::size_t size) : m_buffer(size) 
-		{
-			m_bitSize = size * bits_per_byte;
-		}
+		MemoryStream(const std::size_t size) : m_buffer(size) {}
 		MemoryStream(const MemoryBuffer& buffer) : m_buffer{ buffer } {}
 		MemoryStream(const MemoryStream& stream) = delete;
 		~MemoryStream() = default;
@@ -24,7 +32,7 @@ namespace starnet
 		inline const uint32_t* getData() const { return m_buffer.data(); }
 
 		inline std::size_t getSize() const { return m_buffer.size(); }
-		inline const uint32_t& getBitSize() const { return m_bitSize; }
+		inline std::size_t getBitsNum() const { return getSize() * bits_per_word; }
 
 	protected:
 
@@ -32,11 +40,9 @@ namespace starnet
 		MemoryBuffer m_buffer;
 		// word index
 		uint32_t m_wordIndex{ 0 };
-		// number of available bits
-		uint32_t m_bitSize{ 0 };
 
-		static constexpr uint8_t bits_per_byte = 8;
-		static constexpr uint8_t bits_per_word = sizeof(uint32_t) * bits_per_byte;
+		static constexpr std::size_t bits_per_byte = 8;
+		static constexpr std::size_t bits_per_word = sizeof(uint32_t) * bits_per_byte;
 
 	};
 
@@ -52,14 +58,16 @@ namespace starnet
 		{
 			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
 				"Generic write only supports primitive data type");
+			
+			// #todo: endianness
 
 			if (constexpr(bits <= bits_per_word))
 			{
 				m_scratch |= (data << m_offset);
-				m_offset += (uint8_t)bits;
+				m_offset += bits;
 				if (m_offset >= bits_per_word)
 				{
-					// #todo: endianness
+					// automatic truncation
 					m_buffer[m_wordIndex] = uint32_t(m_scratch);
 					m_scratch >>= bits_per_word;
 					m_buffer.push_back(0);
@@ -72,7 +80,7 @@ namespace starnet
 				const std::size_t words_count = bits / bits_per_word;
 				const std::size_t rest_bits = bits % bits_per_word;
 
-				for (std::size_t i = 0; i < words_count; ++i)
+				for (std::size_t i{ 0 }; i < words_count; ++i)
 				{
 					write(data, bits_per_word);
 					data >>= bits_per_word;
@@ -87,17 +95,20 @@ namespace starnet
 
 		void flush()
 		{
-			if (m_scratch != 0)
+			if (m_offset > 0)
 			{
-
+				assert(m_offset < bits_per_word);
+				m_buffer[m_wordIndex] = uint32_t(m_scratch);
+				m_scratch = m_offset = 0;
 			}
 		}
 
 	private:
+
 		// used to store temporary bits
 		uint64_t m_scratch{ 0 };
 		// scratch bit offset
-		uint8_t m_offset{ 0 };
+		std::size_t m_offset{ 0 };
 	};
 
 	class InputMemoryStream : public MemoryStream
@@ -107,20 +118,77 @@ namespace starnet
 		InputMemoryStream(const MemoryBuffer& buffer) : MemoryStream(buffer) 
 		{
 			m_scratch = m_buffer[m_wordIndex];
+			m_offset = bits_per_word;
 		}
 
 		template<typename T>
-		void read(T& data, const std::size_t bits = sizeof(T) * bits_per_byte)
+		bool read(T& data, const std::size_t bits = sizeof(T) * bits_per_byte)
 		{
-			data = T{ m_scratch & ((uint64_t(1) << bits) - 1) };
-			m_scratch >>= (uint8_t)bits;
-			m_offset += (uint8_t)bits;
+			static_assert(std::is_fundamental<T>::value || std::is_enum<T>::value,
+				"Generic read only supports primitive data type");
+
+			// #todo: endianness
+
+			if (constexpr(bits <= bits_per_word))
+			{
+				if (bits > m_offset)
+				{
+					if (m_wordIndex < getSize() - 1)
+					{
+						++m_wordIndex;
+						m_scratch |= (m_buffer[m_wordIndex] << m_offset);
+						m_offset += bits_per_word;
+					}
+					else
+					{
+						if (m_offset == 0)
+						{
+							// no more data to read
+							return false;
+						}
+					}
+				}
+
+				// example, 1 << 3 will produce 1000, 1000 - 1 = 0111
+				const uint64_t mask = (one << bits) - 1;
+				data = T(m_scratch & mask);
+				m_scratch >>= bits;
+				m_offset -= bits;
+				return true;
+			}
+			else
+			{
+				const std::size_t words_count = bits / bits_per_word;
+				const std::size_t rest_bits = bits % bits_per_word;
+				const std::size_t words_amount = words_count + (rest_bits != 0) ? 1 : 0;
+
+				const std::size_t amount = std::min<std::size_t>(words_amount, getSize() - m_wordIndex);
+				if (amount > 0)
+				{
+					std::memcpy(&data, &m_buffer[m_wordIndex], amount);
+					m_wordIndex += amount;
+
+					if (amount == words_amount && rest_bits > 0)
+					{
+						uint32_t* address = reinterpret_cast<uint32_t*>(std::addressof(data));
+						*(address + words_count) &= ((one << (bits_per_word - m_offset)) - 1);
+					}
+
+					m_scratch = m_buffer[m_wordIndex] >> m_offset;
+					m_offset = bits_per_word - m_offset;
+					return true;
+				}
+				return false;
+			}			
 		}
 
 	private:
+
+		static constexpr uint64_t one = uint64_t(1);
+
 		// used to store temporary bits
-		uint64_t m_scratch{ 0 };
+		uint64_t m_scratch;
 		// scratch bit offset
-		uint8_t m_offset{ 0 };
+		std::size_t m_offset;
 	};
 }
