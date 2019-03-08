@@ -10,12 +10,11 @@ namespace starnet
 	{
 	public:
 
-		// used to indicate the Network protocol
-		enum class ProtocolFamily : uint8_t
+		enum class TransportProtocol
 		{
-			None,
-			IPv4,
-			IPv6
+			Unknown,
+			TCP,
+			UDP
 		};
 
 		// indicates the type of socket being used

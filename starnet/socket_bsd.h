@@ -21,7 +21,14 @@ namespace starnet
 
 		inline NativeSocketType getNativeSocket() const { return m_socket; }
 
+		virtual bool bind(const Address& address) override;
+		virtual bool connect(const Address& address) override;
+		virtual bool listen(unsigned int numOfMaxConnections) override;
+		virtual class Socket* accept() const override;
+		virtual class Socket* accept(Address& outAddress) const override;
 
+		virtual bool shutdown(ShutdownMode mode) override;
+		virtual bool close() override;
 
 	private:
 
