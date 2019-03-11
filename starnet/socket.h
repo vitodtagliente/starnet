@@ -78,12 +78,13 @@ namespace starnet
 		virtual bool sendTo(const Address& address, const uint8_t* data, const std::size_t count, int32_t& byteSent) = 0;
 
 		virtual bool receive(uint8_t* data, std::size_t bufferSize, int32_t& bytesRead) = 0;
-		virtual bool receiveFrom(const Address& address, uint8_t* data, std::size_t bufferSize, int32_t& bytesRead) = 0;
+		virtual bool receiveFrom(Address& address, uint8_t* data, std::size_t bufferSize, int32_t& bytesRead) = 0;
 
 		virtual ConnectionState getConnectionState() const = 0;
 		virtual Address& getAddress() const = 0;
 
 		virtual bool setNonBlockingMode(const bool isNonBlocking = true) = 0;
+		virtual bool setBroadcastMode(const bool isBroadcast = true) = 0;
 
 		virtual bool setSendBufferSize(const std::size_t size) = 0;
 		virtual bool setReceiveBufferSize(const std::size_t size) = 0;

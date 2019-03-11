@@ -12,25 +12,33 @@ namespace starnet
 		
 		typedef uint16_t PortType;
 
-		enum class NetworkProtocol : uint8_t
+		enum class NetworkProtocol
 		{
+			Unknown,
 			IPv4,
 			IPv6
 		};
 
-		Address(const std::string& ip, const PortType port){}
+		Address(const std::string& ip, 
+			const PortType port, 
+			const NetworkProtocol protocol = NetworkProtocol::IPv4)
+			: m_ip(ip), m_port(port), m_protocol(protocol)
+		{}
 		virtual ~Address() {}
 
-		virtual void setIp(const std::string& ip) = 0;
-		virtual void setPort(const PortType port) = 0;
+		inline const std::string& getIP() const { return m_ip; }
+		inline PortType getPort() const { return m_port; }
+		inline NetworkProtocol getNetworkProtocol() const { return m_protocol; }
 
-		virtual void setAnyAddress() = 0;
-		virtual void setBroadcastAddress() = 0;
-		virtual void setLoopbackAddress() = 0;
+		virtual std::size_t getNativeSize() const = 0;
+		
+		virtual bool isValid() const = 0;
 
 		virtual bool operator== (const Address& other) const
 		{
-			return false;
+			return m_ip == other.m_ip &&
+				m_port == other.m_port &&
+				m_protocol == other.m_protocol;
 		}
 
 		bool operator!= (const Address& other) const
@@ -38,9 +46,20 @@ namespace starnet
 			return !(*this == other);
 		}
 
+		static const std::string loopbackAddress;
+		static const PortType unusedPort;
+
 	protected:
 
-
+		// ip address
+		std::string m_ip;
+		// port 
+		PortType m_port;
+		// network protocol
+		NetworkProtocol m_protocol;
 
 	};
+
+	const std::string Address::loopbackAddress{ "127.0.0.1" };
+	const Address::PortType Address::unusedPort{ 0 };
 }
