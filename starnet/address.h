@@ -4,13 +4,19 @@
 #include <string>
 #include "common.h"
 
+/*
+	#todo: add support for the "127.0.0.1:8080" address resolving
+		   and the www.google.com resolving (DNS)
+*/
+
 namespace starnet
 {
 	class Address
 	{	
 	public:
 		
-		typedef uint16_t PortType;
+		// port type 
+		using port_t = uint16_t;
 
 		enum class NetworkProtocol
 		{
@@ -20,19 +26,18 @@ namespace starnet
 		};
 
 		Address(const std::string& ip, 
-			const PortType port, 
+			const port_t port, 
 			const NetworkProtocol protocol = NetworkProtocol::IPv4)
 			: m_ip(ip), m_port(port), m_protocol(protocol)
 		{}
 		virtual ~Address() {}
 
 		inline const std::string& getIP() const { return m_ip; }
-		inline PortType getPort() const { return m_port; }
+		inline port_t getPort() const { return m_port; }
 		inline NetworkProtocol getNetworkProtocol() const { return m_protocol; }
-
-		virtual std::size_t getNativeSize() const = 0;
 		
-		virtual bool isValid() const = 0;
+		virtual bool isValid() const { return m_protocol != NetworkProtocol::Unknown; }
+		inline operator bool() const { return isValid(); }
 
 		virtual bool operator== (const Address& other) const
 		{
@@ -46,20 +51,14 @@ namespace starnet
 			return !(*this == other);
 		}
 
-		static const std::string loopbackAddress;
-		static const PortType unusedPort;
-
 	protected:
 
 		// ip address
 		std::string m_ip;
 		// port 
-		PortType m_port;
+		port_t m_port;
 		// network protocol
 		NetworkProtocol m_protocol;
 
 	};
-
-	const std::string Address::loopbackAddress{ "127.0.0.1" };
-	const Address::PortType Address::unusedPort{ 0 };
 }

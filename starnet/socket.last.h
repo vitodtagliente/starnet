@@ -9,7 +9,7 @@ namespace starnet
 {
 	// define a shared SocketType that match the platform specific type definition
 #ifdef WIN32
-	typedef SOCKET NativeSocketType;
+	typedef SOCKET native_socket_t;
 #else
 	typedef int NativeSocketType;
 #endif
@@ -59,7 +59,7 @@ namespace starnet
 			);
 		}
 
-		Socket(const NativeSocketType socket, const Address& address, const TransportProtocol protocol = TransportProtocol::UDP)
+		Socket(const native_socket_t socket, const Address& address, const TransportProtocol protocol = TransportProtocol::UDP)
 			: m_socket{ socket }, m_address{ address }, m_protocol{ protocol }
 		{
 
@@ -73,7 +73,7 @@ namespace starnet
 				close();
 		}
 
-		inline NativeSocketType getNativeSocket() const { return m_socket; }
+		inline native_socket_t getNativeSocket() const { return m_socket; }
 		inline TransportProtocol getTransportProtocol() const { return m_protocol; }
 		inline const Address& getAddress() const { return m_address; }
 
@@ -139,7 +139,7 @@ namespace starnet
 	protected:
 
 		// native socket data
-		NativeSocketType m_socket;
+		native_socket_t m_socket;
 		// nework address 
 		Address m_address;
 		// transport layer protocol
@@ -156,7 +156,7 @@ namespace starnet
 
 		}
 
-		UDPSocket(const NativeSocketType socket, const Address& address)
+		UDPSocket(const native_socket_t socket, const Address& address)
 			: Socket(socket, address, TransportProtocol::UDP)
 		{
 
@@ -215,7 +215,7 @@ namespace starnet
 
 		}
 
-		TCPSocket(const NativeSocketType socket, const Address& address)
+		TCPSocket(const native_socket_t socket, const Address& address)
 			: Socket(socket, address, TransportProtocol::TCP)
 		{
 
@@ -249,7 +249,7 @@ namespace starnet
 			unsigned int size = sizeof(address);
 #endif
 
-			NativeSocketType newSocket = ::accept(
+			native_socket_t newSocket = ::accept(
 				m_socket,
 				&address,
 				&size

@@ -1,8 +1,10 @@
 #include "..\starnet\address_bsd.h"
 
+// #todo: implements IPv6
+
 namespace starnet
 {
-	AddressBSD::AddressBSD(const std::string & ip, const PortType port, const NetworkProtocol protocol)
+	AddressBSD::AddressBSD(const std::string & ip, const port_t port, const NetworkProtocol protocol)
 		: Address(ip, port, protocol)
 	{
 		uint8_t native_protocol;
@@ -26,17 +28,7 @@ namespace starnet
 
 	AddressBSD::~AddressBSD()
 	{
-		m_address = NativeAddressType{};
+		m_address = native_addr_t{};
 		m_protocol = NetworkProtocol::Unknown;
-	}
-
-	std::size_t AddressBSD::getNativeSize() const
-	{
-		return sizeof(m_address);
-	}
-
-	bool AddressBSD::isValid() const
-	{
-		return m_protocol != NetworkProtocol::Unknown;
 	}
 }

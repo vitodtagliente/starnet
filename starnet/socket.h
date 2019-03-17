@@ -18,7 +18,7 @@ namespace starnet
 		};
 
 		// indicates the type of socket being used
-		enum Type
+		enum class Type
 		{
 			Unknown,
 			// UDP type socket
@@ -28,14 +28,14 @@ namespace starnet
 		};
 
 		// indicates the connection state of the socket
-		enum ConnectionState
+		enum class ConnectionState
 		{
 			NotConnected,
 			Connected,
 			Error
 		};
 
-		enum ShutdownMode
+		enum class ShutdownMode
 		{			
 			// disable reading on the socket
 			Read,
@@ -94,10 +94,14 @@ namespace starnet
 		// close the socket
 		virtual bool close() = 0;
 
+		virtual bool isValid() const = 0;
+		inline operator bool() const { return isValid(); }
+
 	protected:
 
 		// indicates the socket type
 		const Type m_type;
-
+		// indicates the transport protocol
+		TransportProtocol m_protocol;
 	};
 }

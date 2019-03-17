@@ -22,7 +22,7 @@ namespace starnet
 
 	Socket* SocketBSD::accept() const
 	{
-		NativeSocketType newSocket = ::accept(m_socket, NULL, NULL);
+		native_socket_t newSocket = ::accept(m_socket, NULL, NULL);
 		if (newSocket != INVALID_SOCKET)
 		{
 			return new SocketBSD(newSocket, m_type);
@@ -39,7 +39,7 @@ namespace starnet
 		unsigned int size = sizeof(address);
 #endif
 
-		NativeSocketType newSocket = ::accept(
+		native_socket_t newSocket = ::accept(
 			m_socket,
 			&address,
 			&size
