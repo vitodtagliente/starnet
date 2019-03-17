@@ -18,13 +18,7 @@ namespace starnet
 		// port type 
 		using port_t = uint16_t;
 		// native address type
-		using native_addr_t = 
-#ifdef BERKELEY_SUBSYSTEM
-			sockaddr
-#else 
-			void
-#endif
-			;
+		using native_addr_t = sockaddr;
 
 		// identify the network protocol
 		enum class NetworkProtocol
@@ -37,9 +31,10 @@ namespace starnet
 		Address(const std::string& ip,
 			const port_t port,
 			const NetworkProtocol protocol = NetworkProtocol::IPv4);
+		// @param address in format like 127.0.0.1:80
 		Address(const std::string& address,
 			const NetworkProtocol protocol = NetworkProtocol::IPv4);
-		~Address();
+		~Address() = default;
 
 		inline const std::string& getIP() const { return m_ip; }
 		inline port_t getPort() const { return m_port; }
@@ -47,6 +42,7 @@ namespace starnet
 		
 		inline const native_addr_t& getNativeAddress() const { return m_address; }
 		inline std::size_t getNativeSize() const { return sizeof(m_address); }
+		uint8_t getNativeProtocol(const NetworkProtocol protocol) const;
 
 		bool isValid() const;
 		inline operator bool() const { return isValid(); }
@@ -64,6 +60,9 @@ namespace starnet
 		}
 
 	private:
+		
+		// initialize the native data 
+		void nativeInit();
 
 		// ip address
 		std::string m_ip;

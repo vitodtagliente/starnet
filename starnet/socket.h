@@ -55,13 +55,14 @@ namespace starnet
 			Both
 		};
 
-		Socket() : m_socket(), m_type(Type::Unknown) {}
-		Socket(const Type type) : m_socket(), m_type(type) {}
-		Socket(const native_socket_t socket, const Type type)
-			: m_socket(socket), m_type(type) {}
-		~Socket() {}
+		Socket(const Address& address, const Type type, const TransportProtocol protocol);
+		Socket(const native_socket_t socket, const Type type);
+		~Socket() = default;
 
 		inline Type getType() const { return m_type; }
+		uint8_t getNativeType() const;
+		inline TransportProtocol getProtocol() const { return m_protocol; }
+		uint8_t getNativeProtocol() const;
 
 		// Notify the operating system that a socket will use a specific address
 		// and transport layer port.
@@ -93,7 +94,8 @@ namespace starnet
 		bool receiveFrom(Address& address, uint8_t* data, std::size_t bufferSize, int32_t& bytesRead);
 
 		ConnectionState getConnectionState() const;
-		Address& getAddress() const;
+
+		const Address& getAddress() const { return m_address; }
 
 		bool setNonBlockingMode(const bool isNonBlocking = true);
 		bool setBroadcastMode(const bool isBroadcast = true);
@@ -113,6 +115,8 @@ namespace starnet
 
 		// native socket 
 		native_socket_t m_socket;
+		// socket address
+		Address m_address;
 		// indicates the socket type
 		const Type m_type;
 		// indicates the transport protocol

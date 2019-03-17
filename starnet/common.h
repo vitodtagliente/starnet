@@ -21,9 +21,3 @@
 #include <fcntl.h>
 
 #endif
-
-#ifdef PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_OSX
-#define BERKELEY_SUBSYSTEM 1;
-#else 
-#define UNKNOWN_SUBSYSTEM 1;
-#endif
