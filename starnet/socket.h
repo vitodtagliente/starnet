@@ -10,6 +10,16 @@ namespace starnet
 	{
 	public:
 
+		// native socket type
+		using native_socket_t =
+#ifdef PLATFORM_WINDOWS
+		SOCKET
+#else 
+		int
+#endif
+		;
+
+		// transport protocol
 		enum class TransportProtocol
 		{
 			Unknown,
@@ -45,60 +55,64 @@ namespace starnet
 			Both
 		};
 
-		Socket() : m_type(Type::Unknown) {}
-		Socket(Type type) : m_type(type) {}
-		virtual ~Socket() {}
+		Socket() : m_socket(), m_type(Type::Unknown) {}
+		Socket(const Type type) : m_socket(), m_type(type) {}
+		Socket(const native_socket_t socket, const Type type)
+			: m_socket(socket), m_type(type) {}
+		~Socket() {}
 
 		inline Type getType() const { return m_type; }
 
 		// Notify the operating system that a socket will use a specific address
 		// and transport layer port.
-		virtual bool bind(const Address& address) = 0;
+		bool bind(const Address& address);
 		// Calling connect initialized the TCP handshake by sending 
 		// the initial SYN packet to a target host.
 		// if the host has a listen socket bound to the appropriate port, 
 		// it can proceed with the handshake by calling accept.
-		virtual bool connect(const Address& address) = 0;
+		bool connect(const Address& address);
 		// numOfMaxConnections is the maximum number of incoming 
 		// connections that should be allowed to queue up.
 		// Once the maximum number of handshakes are pending, 
 		// any futher incoming connection is dropped.
-		virtual bool listen(unsigned int numOfMaxConnections) = 0;
+		bool listen(unsigned int numOfMaxConnections);
 		// accept an incoming connection and continue to the handshake.
-		virtual class Socket* accept() const = 0;
-		virtual class Socket* accept(Address& outAddress) const = 0;
+		class Socket* accept() const;
+		class Socket* accept(Address& outAddress) const;
 
 		// A connected socket stores the remote host's address information.
 		// Because of this, a process does not need to pass an address. 
 		// @param data The buffer to send
 		// @param count The size of the data to send
 		// @param byteSent Will indicate how much was sent
-		virtual bool send(const uint8_t* data, const std::size_t count, int32_t& byteSent) = 0;
+		bool send(const uint8_t* data, const std::size_t count, int32_t& byteSent);
 		// Send data to a specific address
-		virtual bool sendTo(const Address& address, const uint8_t* data, const std::size_t count, int32_t& byteSent) = 0;
+		bool sendTo(const Address& address, const uint8_t* data, const std::size_t count, int32_t& byteSent);
 
-		virtual bool receive(uint8_t* data, std::size_t bufferSize, int32_t& bytesRead) = 0;
-		virtual bool receiveFrom(Address& address, uint8_t* data, std::size_t bufferSize, int32_t& bytesRead) = 0;
+		bool receive(uint8_t* data, std::size_t bufferSize, int32_t& bytesRead);
+		bool receiveFrom(Address& address, uint8_t* data, std::size_t bufferSize, int32_t& bytesRead);
 
-		virtual ConnectionState getConnectionState() const = 0;
-		virtual Address& getAddress() const = 0;
+		ConnectionState getConnectionState() const;
+		Address& getAddress() const;
 
-		virtual bool setNonBlockingMode(const bool isNonBlocking = true) = 0;
-		virtual bool setBroadcastMode(const bool isBroadcast = true) = 0;
+		bool setNonBlockingMode(const bool isNonBlocking = true);
+		bool setBroadcastMode(const bool isBroadcast = true);
 
-		virtual bool setSendBufferSize(const std::size_t size) = 0;
-		virtual bool setReceiveBufferSize(const std::size_t size) = 0;
+		bool setSendBufferSize(const std::size_t size);
+		bool setReceiveBufferSize(const std::size_t size);
 
 		// shuts down the socket
-		virtual bool shutdown(ShutdownMode mode) = 0;
+		bool shutdown(ShutdownMode mode);
 		// close the socket
-		virtual bool close() = 0;
+		bool close();
 
-		virtual bool isValid() const = 0;
+		bool isValid() const;
 		inline operator bool() const { return isValid(); }
 
-	protected:
+	private:
 
+		// native socket 
+		native_socket_t m_socket;
 		// indicates the socket type
 		const Type m_type;
 		// indicates the transport protocol

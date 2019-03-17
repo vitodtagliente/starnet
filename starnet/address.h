@@ -17,7 +17,16 @@ namespace starnet
 		
 		// port type 
 		using port_t = uint16_t;
+		// native address type
+		using native_addr_t = 
+#ifdef BERKELEY_SUBSYSTEM
+			sockaddr
+#else 
+			void
+#endif
+			;
 
+		// identify the network protocol
 		enum class NetworkProtocol
 		{
 			Unknown,
@@ -25,33 +34,36 @@ namespace starnet
 			IPv6
 		};
 
-		Address(const std::string& ip, 
-			const port_t port, 
-			const NetworkProtocol protocol = NetworkProtocol::IPv4)
-			: m_ip(ip), m_port(port), m_protocol(protocol)
-		{}
-		virtual ~Address() {}
+		Address(const std::string& ip,
+			const port_t port,
+			const NetworkProtocol protocol = NetworkProtocol::IPv4);
+		Address(const std::string& address,
+			const NetworkProtocol protocol = NetworkProtocol::IPv4);
+		~Address();
 
 		inline const std::string& getIP() const { return m_ip; }
 		inline port_t getPort() const { return m_port; }
 		inline NetworkProtocol getNetworkProtocol() const { return m_protocol; }
 		
-		virtual bool isValid() const { return m_protocol != NetworkProtocol::Unknown; }
+		inline const native_addr_t& getNativeAddress() const { return m_address; }
+		inline std::size_t getNativeSize() const { return sizeof(m_address); }
+
+		bool isValid() const;
 		inline operator bool() const { return isValid(); }
 
-		virtual bool operator== (const Address& other) const
+		inline bool operator== (const Address& other) const
 		{
 			return m_ip == other.m_ip &&
 				m_port == other.m_port &&
 				m_protocol == other.m_protocol;
 		}
 
-		bool operator!= (const Address& other) const
+		inline bool operator!= (const Address& other) const
 		{
 			return !(*this == other);
 		}
 
-	protected:
+	private:
 
 		// ip address
 		std::string m_ip;
@@ -60,5 +72,7 @@ namespace starnet
 		// network protocol
 		NetworkProtocol m_protocol;
 
+		// native address type
+		native_addr_t m_address;
 	};
 }

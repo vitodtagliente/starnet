@@ -22,21 +22,8 @@
 
 #endif
 
-namespace starnet
-{
-	enum class NativeSocketSystem : uint8_t
-	{
-		Unknown,
-		Berkeley,
-		// ... future supports (es. PS4, XBoxLive, ...)
-		Count
-	};
-
-	inline NativeSocketSystem getNativeSocketSystem()
-	{
-#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MAC
-		return NativeSocketSystem::Berkeley;
+#ifdef PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_OSX
+#define BERKELEY_SUBSYSTEM 1;
+#else 
+#define UNKNOWN_SUBSYSTEM 1;
 #endif
-		return NativeSocketSystem::Unknown;
-	}
-}
