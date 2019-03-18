@@ -14,6 +14,7 @@ add_executable(
     ${PROJECT_SOURCES} 
 )
 
+add_subdirectory(Samples/EchoServer)
 add_subdirectory(Samples/BaseUDPChat)
 add_subdirectory(Samples/BaseTCPChat)
 add_subdirectory(Samples/MemoryStreams)

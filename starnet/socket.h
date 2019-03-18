@@ -55,9 +55,9 @@ namespace starnet
 			Both
 		};
 
-		Socket(const Address& address, const Type type, const TransportProtocol protocol);
-		Socket(const native_socket_t socket, const Type type);
-		~Socket() = default;
+		Socket(const Address& address, const TransportProtocol protocol);
+		Socket(const native_socket_t socket, const Address& address, const TransportProtocol protocol);
+		~Socket();
 
 		inline Type getType() const { return m_type; }
 		uint8_t getNativeType() const;
@@ -66,7 +66,7 @@ namespace starnet
 
 		// Notify the operating system that a socket will use a specific address
 		// and transport layer port.
-		bool bind(const Address& address);
+		bool bind();
 		// Calling connect initialized the TCP handshake by sending 
 		// the initial SYN packet to a target host.
 		// if the host has a listen socket bound to the appropriate port, 
@@ -79,7 +79,6 @@ namespace starnet
 		bool listen(unsigned int numOfMaxConnections);
 		// accept an incoming connection and continue to the handshake.
 		class Socket* accept() const;
-		class Socket* accept(Address& outAddress) const;
 
 		// A connected socket stores the remote host's address information.
 		// Because of this, a process does not need to pass an address. 
@@ -118,7 +117,7 @@ namespace starnet
 		// socket address
 		Address m_address;
 		// indicates the socket type
-		const Type m_type;
+		Type m_type;
 		// indicates the transport protocol
 		TransportProtocol m_protocol;
 	};

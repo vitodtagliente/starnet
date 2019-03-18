@@ -34,6 +34,8 @@ namespace starnet
 		// @param address in format like 127.0.0.1:80
 		Address(const std::string& address,
 			const NetworkProtocol protocol = NetworkProtocol::IPv4);
+		Address(const native_addr_t& address,
+			const NetworkProtocol protocol = NetworkProtocol::IPv4);
 		~Address() = default;
 
 		inline const std::string& getIP() const { return m_ip; }
@@ -42,7 +44,7 @@ namespace starnet
 		
 		inline const native_addr_t& getNativeAddress() const { return m_address; }
 		inline std::size_t getNativeSize() const { return sizeof(m_address); }
-		uint8_t getNativeProtocol(const NetworkProtocol protocol) const;
+		uint8_t getNativeProtocol() const;
 
 		bool isValid() const;
 		inline operator bool() const { return isValid(); }

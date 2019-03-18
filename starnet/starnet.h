@@ -3,11 +3,8 @@
 #include "common.h"
 #include "endianness.h"
 #include "error.h"
+#include "address.h"
 #include "socket.h"
-#include "byte_stream.h"
-#include "bit_stream.h"
-#include "memory_stream.h"
-#include "serialization.h"
 
 namespace starnet
 {

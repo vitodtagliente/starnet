@@ -2,8 +2,8 @@
 
 namespace starnet
 {
-	Socket::Socket(const Address& address, const Type type, const TransportProtocol protocol)
-		: m_address(address), m_type(type), m_protocol(protocol)
+	Socket::Socket(const Address& address, const TransportProtocol protocol)
+		: m_address(address), m_protocol(protocol)
 	{
 		m_socket = ::socket(
 			// address family / network layer protocol
@@ -15,9 +15,27 @@ namespace starnet
 		);
 	}
 
-	Socket::Socket(const native_socket_t socket, const Type type)
-		: m_socket(socket), m_type(type)
+	Socket::Socket(const native_socket_t socket, const Address& address, const TransportProtocol protocol)
+		: m_socket(socket), m_address(address), m_protocol(protocol)
 	{
+		switch (protocol)
+		{
+		case TransportProtocol::UDP:
+			m_type = Type::Datagram;
+			break;
+		case TransportProtocol::TCP:
+			m_type = Type::Stream;
+			break;
+		case TransportProtocol::Unknown:
+		default:
+			m_type = Type::Unknown;
+			break;
+		}
+	}
+
+	Socket::~Socket()
+	{
+
 	}
 
 	uint8_t Socket::getNativeType() const
@@ -54,9 +72,9 @@ namespace starnet
 		}
 	}
 
-	bool Socket::bind(const Address& address)
+	bool Socket::bind()
 	{
-		return ::bind(m_socket, &address.getNativeAddress(), address.getNativeSize()) == 0;
+		return ::bind(m_socket, &m_address.getNativeAddress(), m_address.getNativeSize()) == 0;
 	}
 
 	bool Socket::connect(const Address& address)
@@ -71,16 +89,6 @@ namespace starnet
 
 	Socket* Socket::accept() const
 	{
-		native_socket_t newSocket = ::accept(m_socket, NULL, NULL);
-		if (newSocket != INVALID_SOCKET)
-		{
-			return new Socket(newSocket, m_type);
-		}
-		return nullptr;
-	}
-
-	Socket* Socket::accept(Address & outAddress) const
-	{
 		Address::native_addr_t address{};
 #if PLATFORM_WINDOWS
 		int size = sizeof(address);
@@ -88,15 +96,10 @@ namespace starnet
 		unsigned int size = sizeof(address);
 #endif
 
-		native_socket_t newSocket = ::accept(
-			m_socket,
-			&address,
-			&size
-		);
-
+		native_socket_t newSocket = ::accept(m_socket, &address, &size);
 		if (newSocket != INVALID_SOCKET)
 		{
-			//return new Socket(newSocket, { address, m_address.getProtocol() });
+			return new Socket(newSocket, { address, m_address.getNetworkProtocol() }, m_protocol);
 		}
 		return nullptr;
 	}

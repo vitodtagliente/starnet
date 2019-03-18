@@ -32,14 +32,19 @@ namespace starnet
 		nativeInit();
 	}
 
+	Address::Address(const native_addr_t & address, const NetworkProtocol protocol)
+		: m_protocol(protocol), m_address(address)
+	{
+	}
+
 	bool Address::isValid() const
 	{
 		return m_protocol != NetworkProtocol::Unknown;
 	}
 
-	uint8_t Address::getNativeProtocol(const NetworkProtocol protocol) const
+	uint8_t Address::getNativeProtocol() const
 	{
-		switch (protocol)
+		switch (m_protocol)
 		{
 		case NetworkProtocol::IPv4:
 			return (uint8_t)AF_INET;
@@ -56,7 +61,7 @@ namespace starnet
 
 	void Address::nativeInit()
 	{
-		const uint8_t native_protocol = getNativeProtocol(m_protocol);
+		const uint8_t native_protocol = getNativeProtocol();
 		// #todo: this is IPv4 only implementation
 		sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&m_address);
 		addr_in->sin_family = native_protocol;
