@@ -4,11 +4,11 @@
 using namespace std;
 using namespace starnet;
 
+const Address::port_t SERVER_PORT = 9001;
+const Address::port_t CLIENT_PORT = 9000;
+
 void client_main();
 void server_main();
-
-#define SERVER_PORT 9670
-#define CLIENT_PORT 9000
 
 int main()
 {
@@ -23,7 +23,8 @@ int main()
 	else client_main();
 
 	cout << "Premi un tasto per continuare...";
-	getchar();
+	int exit;
+	cin >> exit;
 
 	starnet::shutdown();
 
@@ -32,54 +33,37 @@ int main()
 
 void client_main()
 {
-	UDPSocket sock({ Address::localAddress, CLIENT_PORT });
-	if (sock.isValid())
+	Address address{ "127.0.0.1", CLIENT_PORT };
+	Address server{ "127.0.0.1", SERVER_PORT };
+	Socket socket(address, Socket::TransportProtocol::UDP);
+	if (socket.bind())
 	{
-		if (sock.bind())
-		{
-			cout << "Socket binded successfully!" << endl;
-			std::string message{};
-			Address fromAddress{};
-			if (sock.receive(message, fromAddress))
-			{
-				cout << "Message: " << message << endl;
-			}
-			else cout << "Unable to receive a message" << endl;
-		}
-		else
-		{
-			cout << "Invalid socket binding: " << starnet::getErrorMessage() << endl;
-		}
-	}
-	else
-	{
-		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
+		std::string message;
+		cin >> message;
+		cout << "Sending: " << message << endl;
+
+		int32_t byteSent = 0;
+		socket.sendTo(server, reinterpret_cast<const uint8_t*>(message.data()), message.size(), byteSent);
 	}
 }
 
 void server_main() 
 {
-	UDPSocket sock({ Address::localAddress, SERVER_PORT });
-	if (sock.isValid())
+	Address address{ "127.0.0.1", SERVER_PORT };
+	Socket socket(address, Socket::TransportProtocol::UDP);
+	if (socket.bind())
 	{
-		if (sock.bind())
+		uint8_t buffer[100];
+		const std::size_t buffer_size = sizeof(buffer);
+
+		Address client;
+		int32_t byteRead{ 0 };
+		int32_t byteSent{ 0 };
+		while (socket.receiveFrom(client, buffer, buffer_size, byteRead))
 		{
-			cout << "Socket binded successfully!" << endl;
-			cout << "Press to send a message...";
-			getchar();
-			if (sock.send("ciao mondo", { Address::localAddress, CLIENT_PORT }))
-			{
-				cout << "Message sent!" << endl;
-			}
-			else cout << "Unable to send the message" << endl;
+			std::string message{ reinterpret_cast<char*>(buffer), (unsigned int)byteRead };
+			cout << message << endl;
+			socket.sendTo(client, buffer, buffer_size, byteSent);
 		}
-		else
-		{
-			cout << "Invalid socket binding: " << starnet::getErrorMessage() << endl;
-		}
-	}
-	else
-	{
-		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
 	}
 }

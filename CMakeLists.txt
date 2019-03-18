@@ -8,8 +8,9 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB PROJECT_HEADERS *.h starnet/*.h) 
 file(GLOB PROJECT_SOURCES *.cpp src/*.cpp)
 
-add_executable(
+add_library(
     ${PROJECT_NAME} 
+	STATIC
     ${PROJECT_HEADERS}
     ${PROJECT_SOURCES} 
 )

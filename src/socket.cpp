@@ -145,9 +145,9 @@ namespace starnet
 		Address::native_addr_t native_address{};
 
 #if PLATFORM_WINDOWS
-		int size = sizeof(address);
+		int size = sizeof(native_address);
 #else 
-		unsigned int size = sizeof(address);
+		unsigned int size = sizeof(native_address);
 #endif
 	
 		bytesRead = ::recvfrom(
@@ -161,6 +161,7 @@ namespace starnet
 
 		if (bytesRead >= 0)
 		{
+			address = { native_address, m_address.getNetworkProtocol() };
 			// For Streaming sockets, 0 indicates a graceful failure
 			return (m_type != Socket::Type::Stream) || (bytesRead > 0);
 		}

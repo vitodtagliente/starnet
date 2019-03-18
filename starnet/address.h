@@ -28,6 +28,7 @@ namespace starnet
 			IPv6
 		};
 
+		Address() {}
 		Address(const std::string& ip,
 			const port_t port,
 			const NetworkProtocol protocol = NetworkProtocol::IPv4);
