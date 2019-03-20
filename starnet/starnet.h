@@ -1,10 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "endianness.h"
-#include "error.h"
 #include "address.h"
-#include "socket.h"
 
 namespace starnet
 {

@@ -15,6 +15,7 @@ add_library(
     ${PROJECT_SOURCES} 
 )
 
+add_subdirectory(Samples/BaseTest)
 add_subdirectory(Samples/EchoServer)
 add_subdirectory(Samples/BaseUDPChat)
 add_subdirectory(Samples/BaseTCPChat)

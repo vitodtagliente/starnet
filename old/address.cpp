@@ -5,10 +5,10 @@
 
 namespace starnet
 {
-	Address::Address(const NetworkProtocol protocol = NetworkProtocol::IPv4)
+	Address::Address(const NetworkProtocol protocol)
 		: m_protocol(protocol)
 	{
-		//if constexpr (m_protocol == NetworkProtocol::IPv4)
+		if(m_protocol == NetworkProtocol::IPv4)
 		{
 			sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&m_address);
 			addr_in->sin_family = getNativeProtocol(protocol);
@@ -65,6 +65,10 @@ namespace starnet
 	starnet::Address::port_t Address::getPort() const
 	{
 
+	}
+
+	void Address::setNetworkProtocol(const NetworkProtocol)
+	{
 	}
 
 	bool Address::isValid() const
