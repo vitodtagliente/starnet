@@ -22,6 +22,7 @@ namespace starnet
 		// native address type
 		using native_addr_t = sockaddr;
 
+		Address() : m_protocol(NetworkProtocol::Unknown) {} 
 		Address(const NetworkProtocol protocol) : m_protocol(protocol) {}
 		Address(const native_addr_t& address) : m_address(address)
 		{
@@ -32,7 +33,7 @@ namespace starnet
 
 		inline const native_addr_t& getNativeAddress() const { return m_address; }
 		inline std::size_t getNativeSize() const { return sizeof(m_address); }
-		inline NetworkProtocol getNetworkProtocol() const { return m_protocol; }
+		inline NetworkProtocol getProtocol() const { return m_protocol; }
 
 		virtual bool isValid() const
 		{
