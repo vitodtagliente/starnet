@@ -5,10 +5,21 @@
 
 namespace starnet
 {
-	Address::Address(const std::string& ip, const port_t port, const NetworkProtocol protocol)
-		: m_ip(ip), m_port(port), m_protocol(protocol)
+	Address::Address(const NetworkProtocol protocol = NetworkProtocol::IPv4)
+		: m_protocol(protocol)
 	{
-		nativeInit();
+		//if constexpr (m_protocol == NetworkProtocol::IPv4)
+		{
+			sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&m_address);
+			addr_in->sin_family = getNativeProtocol(protocol);
+		}
+		
+	}
+
+	Address::Address(const std::string& ip, const port_t port, const NetworkProtocol protocol)
+		: m_protocol(protocol)
+	{
+
 	}
 
 	Address::Address(const std::string& address, const NetworkProtocol protocol)
@@ -20,21 +31,40 @@ namespace starnet
 		assert(separator != address.size() - 1 && "address has ':' as last character. Expected port number here");
 
 		// isolate address
-		m_ip = address.substr(0, separator);
+		const std::string& ip = address.substr(0, separator);
 
 		// std::stoul converts string to unsigned integer
 		const auto parsed_port = std::stoul(address.substr(separator + 1).c_str(), nullptr, 10);
 		// check if it is a valid port, (0, 65535) range
 		assert(parsed_port < (1 << 16) && "invalid port number");
 
-		m_port = static_cast<port_t>(parsed_port);
-
-		nativeInit();
+		const port_t port = static_cast<port_t>(parsed_port);
 	}
 
 	Address::Address(const native_addr_t & address, const NetworkProtocol protocol)
 		: m_protocol(protocol), m_address(address)
 	{
+		// #todo: retrieve ip and port
+	}
+
+	void Address::setIP(const std::string& ip)
+	{
+
+	}
+
+	const std::string& Address::getIP() const
+	{
+
+	}
+
+	void Address::setPort(const port_t port)
+	{
+
+	}
+
+	starnet::Address::port_t Address::getPort() const
+	{
+
 	}
 
 	bool Address::isValid() const
@@ -42,9 +72,14 @@ namespace starnet
 		return m_protocol != NetworkProtocol::Unknown;
 	}
 
-	uint8_t Address::getNativeProtocol() const
+	bool Address::operator==(const Address& other) const
 	{
-		switch (m_protocol)
+		return false;
+	}
+
+	uint8_t Address::getNativeProtocol(const NetworkProtocol protocol)
+	{
+		switch (protocol)
 		{
 		case NetworkProtocol::IPv4:
 			return (uint8_t)AF_INET;

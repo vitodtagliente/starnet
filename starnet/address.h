@@ -28,7 +28,7 @@ namespace starnet
 			IPv6
 		};
 
-		Address() {}
+		Address(const NetworkProtocol protocol = NetworkProtocol::IPv4);
 		Address(const std::string& ip,
 			const port_t port,
 			const NetworkProtocol protocol = NetworkProtocol::IPv4);
@@ -39,42 +39,33 @@ namespace starnet
 			const NetworkProtocol protocol = NetworkProtocol::IPv4);
 		~Address() = default;
 
-		inline const std::string& getIP() const { return m_ip; }
-		inline port_t getPort() const { return m_port; }
+		void setIP(const std::string& ip);
+		inline const std::string& getIP() const;
+		void setPort(const port_t port);
+		inline port_t getPort() const;
+
 		inline NetworkProtocol getNetworkProtocol() const { return m_protocol; }
 		
 		inline const native_addr_t& getNativeAddress() const { return m_address; }
 		inline std::size_t getNativeSize() const { return sizeof(m_address); }
-		uint8_t getNativeProtocol() const;
 
 		bool isValid() const;
 		inline operator bool() const { return isValid(); }
 
-		inline bool operator== (const Address& other) const
-		{
-			return m_ip == other.m_ip &&
-				m_port == other.m_port &&
-				m_protocol == other.m_protocol;
-		}
+		bool operator== (const Address& other) const;
 
 		inline bool operator!= (const Address& other) const
 		{
 			return !(*this == other);
 		}
 
+		static uint8_t getNativeProtocol(const NetworkProtocol protocol);
+
 	private:
 		
-		// initialize the native data 
-		void nativeInit();
-
-		// ip address
-		std::string m_ip;
-		// port 
-		port_t m_port;
+		// native address type
+		native_addr_t m_address{};
 		// network protocol
 		NetworkProtocol m_protocol;
-
-		// native address type
-		native_addr_t m_address;
 	};
 }
