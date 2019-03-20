@@ -34,10 +34,9 @@ namespace starnet
 		inline std::size_t getNativeSize() const { return sizeof(m_address); }
 		inline NetworkProtocol getNetworkProtocol() const { return m_protocol; }
 
-		bool isValid() const
+		virtual bool isValid() const
 		{
-			// to be implemented
-			return false;
+			return m_protocol != NetworkProtocol::Unknown;
 		}
 
 		inline operator bool() const { return isValid(); }
@@ -102,29 +101,36 @@ namespace starnet
 
 		inline std::string getIP() const
 		{
-			// to be implemented
 			return {};
 		}
 
 		inline port_t getPort() const
 		{
-			// to be implemented
-			return {};
+			if constexpr (protocol == NetworkProtocol::IPv4)
+			{
+				sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&m_address);
+				return ntohs(addr_in->sin_port);
+			}
+			else // IPv6
+			{
+				// to be implemented
+				sockaddr_in6* addr_in = reinterpret_cast<sockaddr_in6*>(&m_address);
+				return ntohs(addr_in->sin6_port);
+			}
 		}
 
 	private:
 
 		void initialize(const std::string& ip, const port_t port)
-		{
-			const uint8_t native_protocol = getNativeNetworkProtocol();
+		{			
 			if constexpr (protocol == NetworkProtocol::IPv4)
 			{
 				sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&m_address);
 				addr_in->sin_port = htons(port);
 #if PLATFORM_WINDOWS
-				InetPton(native_protocol, ip.c_str(), &addr_in->sin_addr);
+				InetPton(AF_INET, ip.c_str(), &addr_in->sin_addr);
 #else
-				inet_pton(native_protocol, ip.c_str(), &addr_in->sin_addr);
+				inet_pton(AF_INET, ip.c_str(), &addr_in->sin_addr);
 #endif
 			}
 			else // IPv6
@@ -132,23 +138,5 @@ namespace starnet
 				// to be implemented
 			}
 		}
-
-		uint8_t getNativeNetworkProtocol() const
-		{
-			switch (protocol)
-			{
-			case NetworkProtocol::IPv4:
-				return (uint8_t)AF_INET;
-				break;
-			case NetworkProtocol::IPv6:
-				return (uint8_t)AF_INET6;
-				break;
-			case NetworkProtocol::Unknown:
-			default:
-				return (uint8_t)AF_UNSPEC;
-				break;
-			}
-		}
-
 	};
 }

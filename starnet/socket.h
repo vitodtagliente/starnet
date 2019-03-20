@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include "address.h"
 #include "platform.h"
 
