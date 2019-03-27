@@ -78,19 +78,42 @@ namespace starnet
 
 	void Address::initialize(const std::string& ip, const port_t port, const NetworkProtocol protocol)
 	{
+		const network_proto_t native_protocol = NetworkProtocolInfo::resolve(protocol);
+
 		if (m_protocol == NetworkProtocol::IPv4)
 		{
 			sockaddr_in* addr_in = reinterpret_cast<sockaddr_in*>(&m_address);
+			addr_in->sin_family = native_protocol;
 			addr_in->sin_port = htons(port);
 #if PLATFORM_WINDOWS
-			InetPton(AF_INET, ip.c_str(), &addr_in->sin_addr);
+			InetPton(native_protocol, ip.c_str(), &addr_in->sin_addr);
 #else
-			inet_pton(AF_INET, ip.c_str(), &addr_in->sin_addr);
+			inet_pton(native_protocol, ip.c_str(), &addr_in->sin_addr);
 #endif
 		}
 		else if(m_protocol == NetworkProtocol::IPv6)
 		{
 			// #todo: to be implemented
 		}
+	}
+
+	Address::network_proto_t Address::NetworkProtocolInfo::resolve(const NetworkProtocol protocol)
+	{
+		if (protocol == NetworkProtocol::IPv4)
+			return AF_INET;
+		else if (protocol == NetworkProtocol::IPv6)
+			return AF_INET6;
+		else // Unknown
+			return AF_UNSPEC;
+	}
+
+	Address::NetworkProtocol Address::NetworkProtocolInfo::resolve(const network_proto_t protocol)
+	{
+		if (protocol == AF_INET)
+			return NetworkProtocol::IPv4;
+		else if (protocol == AF_INET6)
+			return NetworkProtocol::IPv6;
+		else // Unknown
+			return NetworkProtocol::Unknown;
 	}
 }

@@ -5,17 +5,25 @@
 
 namespace starnet
 {
-	// transport protocol
-	enum class TransportProtocol
-	{
-		Unknown,
-		TCP,
-		UDP
-	};
-
 	class Socket
 	{
 	public:
+
+		// transport protocol
+		enum class TransportProtocol
+		{
+			Unknown,
+			TCP,
+			UDP
+		};
+
+		using transport_proto_t = uint8_t;
+
+		struct TransportProtocolInfo
+		{
+			static transport_proto_t resolve(const TransportProtocol protocol);
+			static TransportProtocol resolve(const transport_proto_t protocol);
+		};
 
 		// native socket type
 		using native_socket_t =
@@ -36,6 +44,13 @@ namespace starnet
 			Stream
 		};
 
+		using type_t = uint8_t;
+
+		struct TypeInfo
+		{
+			static type_t resolve(const Type type);
+			static Type resolve(const type_t type);
+		};
 
 		// indicates the connection state of the socket
 		enum class ConnectionState

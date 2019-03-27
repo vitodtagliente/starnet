@@ -38,12 +38,25 @@ void client_main()
 	Socket socket(address, Socket::TransportProtocol::UDP);
 	if (socket.bind())
 	{
-		std::string message;
-		cin >> message;
-		cout << "Sending: " << message << endl;
+		bool running = true;
+		while (running)
+		{
+			cout << "Message [q: exit]: ";
+			std::string message;
+			cin >> message;
+			
+			if (message == "q")
+			{
+				running = false;
+			}
+			else
+			{
+				cout << "Sending: " << message << endl;
 
-		int32_t byteSent = 0;
-		socket.sendTo(server, reinterpret_cast<const uint8_t*>(message.data()), message.size(), byteSent);
+				int32_t byteSent = 0;
+				socket.sendTo(server, reinterpret_cast<const uint8_t*>(message.data()), message.size(), byteSent);
+			}
+		}		
 	}
 }
 

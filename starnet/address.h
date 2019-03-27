@@ -7,17 +7,25 @@
 
 namespace starnet
 {
-	// identify the network protocol
-	enum class NetworkProtocol
-	{
-		Unknown,
-		IPv4,
-		IPv6
-	};
-
 	class Address
 	{
 	public:
+
+		// identify the network protocol
+		enum class NetworkProtocol
+		{
+			Unknown,
+			IPv4,
+			IPv6
+		};
+
+		using network_proto_t = uint8_t;
+
+		struct NetworkProtocolInfo
+		{
+			static network_proto_t resolve(const NetworkProtocol protocol);
+			static NetworkProtocol resolve(const network_proto_t protocol);
+		};
 
 		// native address type
 		using native_addr_t = sockaddr;

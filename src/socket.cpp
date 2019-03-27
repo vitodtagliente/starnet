@@ -7,9 +7,9 @@ namespace starnet
 	{
 		m_type = (protocol == TransportProtocol::TCP) ? Type::Stream : Type::Datagram;
 		m_socket = ::socket(
-			(address.getProtocol() == NetworkProtocol::IPv4) ? AF_INET : AF_INET6,
-			(protocol == TransportProtocol::TCP) ? SOCK_STREAM : SOCK_DGRAM,
-			(protocol == TransportProtocol::TCP) ? IPPROTO_TCP : IPPROTO_UDP
+			Address::NetworkProtocolInfo::resolve(address.getProtocol()),
+			TypeInfo::resolve(m_type),
+			TransportProtocolInfo::resolve(protocol)
 		);
 	}
 
@@ -190,5 +190,46 @@ namespace starnet
 	bool Socket::isValid() const
 	{
 		return m_socket != INVALID_SOCKET;
+	}
+
+	Socket::transport_proto_t Socket::TransportProtocolInfo::resolve(const TransportProtocol protocol)
+	{
+		if (protocol == TransportProtocol::TCP)
+			return IPPROTO_TCP;
+		else if (protocol == TransportProtocol::UDP)
+			return IPPROTO_UDP;
+		else // Unknown
+			return IPPROTO_NONE;
+	}
+
+	Socket::TransportProtocol Socket::TransportProtocolInfo::resolve(const transport_proto_t protocol)
+	{
+		if (protocol == IPPROTO_TCP)
+			return TransportProtocol::TCP;
+		else if (protocol == IPPROTO_UDP)
+			return TransportProtocol::UDP;
+		else
+			return TransportProtocol::Unknown;
+	}
+
+	Socket::type_t Socket::TypeInfo::resolve(const Type type)
+	{
+		if (type == Type::Stream)
+			return SOCK_STREAM;
+		else if (type == Type::Datagram)
+			return SOCK_DGRAM;
+		else
+			// pakcet headers may be custom crafted by the application player
+			return SOCK_RAW;
+	}
+
+	Socket::Type Socket::TypeInfo::resolve(const type_t type)
+	{
+		if (type == SOCK_STREAM)
+			return Type::Stream;
+		else if (type == SOCK_DGRAM)
+			return Type::Datagram;
+		else 
+			return Type::Unknown;
 	}
 }
