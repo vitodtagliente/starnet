@@ -5,71 +5,18 @@ namespace starnet
 	Socket::Socket(const Address& address, const TransportProtocol protocol)
 		: m_address(address), m_protocol(protocol)
 	{
+		m_type = (protocol == TransportProtocol::TCP) ? Type::Stream : Type::Datagram;
 		m_socket = ::socket(
-			// address family / network layer protocol
-			m_address.getNativeProtocol(),
-			// type of socket
-			getNativeType(),
-			// if 0, OS pick the default implemented transport protocol for the given socket type
-			getNativeProtocol()
+			(address.getProtocol() == NetworkProtocol::IPv4) ? AF_INET : AF_INET6,
+			(protocol == TransportProtocol::TCP) ? SOCK_STREAM : SOCK_DGRAM,
+			(protocol == TransportProtocol::TCP) ? IPPROTO_TCP : IPPROTO_UDP
 		);
 	}
 
 	Socket::Socket(const native_socket_t socket, const Address& address, const TransportProtocol protocol)
 		: m_socket(socket), m_address(address), m_protocol(protocol)
 	{
-		switch (protocol)
-		{
-		case TransportProtocol::UDP:
-			m_type = Type::Datagram;
-			break;
-		case TransportProtocol::TCP:
-			m_type = Type::Stream;
-			break;
-		case TransportProtocol::Unknown:
-		default:
-			m_type = Type::Unknown;
-			break;
-		}
-	}
-
-	Socket::~Socket()
-	{
-
-	}
-
-	uint8_t Socket::getNativeType() const
-	{
-		switch (m_type)
-		{
-		case Type::Datagram:
-			return SOCK_DGRAM;
-			break;
-		case Type::Stream:
-			return SOCK_STREAM;
-			break;
-		case Type::Unknown:
-		default:
-			return 0;
-			break;
-		}
-	}
-
-	uint8_t Socket::getNativeProtocol() const
-	{
-		switch (m_protocol)
-		{
-		case TransportProtocol::TCP:
-			return IPPROTO_TCP;
-			break;
-		case TransportProtocol::UDP:
-			return IPPROTO_UDP;
-			break;
-		case TransportProtocol::Unknown:
-		default:
-			return 0;
-			break;
-		}
+		m_type = (protocol == TransportProtocol::TCP) ? Type::Stream : Type::Datagram;
 	}
 
 	bool Socket::bind()
@@ -77,7 +24,7 @@ namespace starnet
 		return ::bind(m_socket, &m_address.getNativeAddress(), m_address.getNativeSize()) == 0;
 	}
 
-	bool Socket::connect(const Address& address)
+	bool Socket::connect(const Address & address)
 	{
 		return ::connect(m_socket, &address.getNativeAddress(), address.getNativeSize()) == 0;
 	}
@@ -87,7 +34,7 @@ namespace starnet
 		return ::listen(m_socket, numOfMaxConnections) == 0;
 	}
 
-	Socket* Socket::accept() const
+	Socket * Socket::accept() const
 	{
 		Address::native_addr_t address{};
 #if PLATFORM_WINDOWS
@@ -99,7 +46,7 @@ namespace starnet
 		native_socket_t newSocket = ::accept(m_socket, &address, &size);
 		if (newSocket != INVALID_SOCKET)
 		{
-			return new Socket(newSocket, { address, m_address.getNetworkProtocol() }, m_protocol);
+			return new Socket(newSocket, { address }, m_protocol);
 		}
 		return nullptr;
 	}
@@ -123,7 +70,7 @@ namespace starnet
 		) >= 0;
 	}
 
-	bool Socket::receive(uint8_t* data, std::size_t bufferSize, int32_t& bytesRead)
+	bool Socket::receive(uint8_t * data, std::size_t bufferSize, int32_t & bytesRead)
 	{
 		const int bytecount = ::recv(
 			m_socket,
@@ -140,7 +87,7 @@ namespace starnet
 		return false;
 	}
 
-	bool Socket::receiveFrom(Address& address, uint8_t* data, std::size_t bufferSize, int32_t& bytesRead)
+	bool Socket::receiveFrom(Address & address, uint8_t * data, std::size_t bufferSize, int32_t & bytesRead)
 	{
 		Address::native_addr_t native_address{};
 
@@ -149,7 +96,7 @@ namespace starnet
 #else 
 		unsigned int size = sizeof(native_address);
 #endif
-	
+
 		bytesRead = ::recvfrom(
 			m_socket,
 			reinterpret_cast<char*>(data),
@@ -161,16 +108,11 @@ namespace starnet
 
 		if (bytesRead >= 0)
 		{
-			address = { native_address, m_address.getNetworkProtocol() };
+			address = { native_address };
 			// For Streaming sockets, 0 indicates a graceful failure
 			return (m_type != Socket::Type::Stream) || (bytesRead > 0);
 		}
 		return false;
-	}
-
-	Socket::ConnectionState Socket::getConnectionState() const
-	{
-		return ConnectionState::NotConnected;
 	}
 
 	bool Socket::setNonBlockingMode(const bool isNonBlocking)
@@ -192,16 +134,6 @@ namespace starnet
 	{
 		int Param = isBroadcast ? 1 : 0;
 		return setsockopt(m_socket, SOL_SOCKET, SO_BROADCAST, (char*)&Param, sizeof(Param)) == 0;
-	}
-
-	bool Socket::setSendBufferSize(const std::size_t size)
-	{
-		return false;
-	}
-
-	bool Socket::setReceiveBufferSize(const std::size_t size)
-	{
-		return false;
 	}
 
 	bool Socket::shutdown(ShutdownMode mode)
@@ -253,5 +185,10 @@ namespace starnet
 		}
 #endif			
 		return false;
+	}
+
+	bool Socket::isValid() const
+	{
+		return m_socket != INVALID_SOCKET;
 	}
 }

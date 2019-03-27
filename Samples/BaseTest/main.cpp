@@ -8,7 +8,7 @@ int main()
 {
 	starnet::startup();
 
-	NetworkAddress<NetworkProtocol::IPv4> address("127.0.0.1:80");
+	Address address("127.0.0.1:80");
 
 	cout << "Premi un tasto per continuare...";
 	int exit;
