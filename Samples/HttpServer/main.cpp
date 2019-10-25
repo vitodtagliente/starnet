@@ -25,8 +25,8 @@ int main()
 
 	while (true)
 	{
-		if (server.getSocket()->receive(
-			reinterpret_cast<uint8_t*>(buffer),
+		if (clientSocket->receive(
+			(uint8_t*)(buffer),
 			buffer_size,
 			byteRead
 		))

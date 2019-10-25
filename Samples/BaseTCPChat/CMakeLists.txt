@@ -17,5 +17,6 @@ add_executable(
 )
 
 target_link_libraries(
-    ${PROJECT_NAME} 
+    ${PROJECT_NAME}
+	starnet
 )

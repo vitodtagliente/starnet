@@ -23,7 +23,8 @@ int main()
 	else client_main();
 
 	cout << "Premi un tasto per continuare...";
-	getchar();
+	int a;
+	cin >> a;
 
 	starnet::shutdown();
 
@@ -32,46 +33,58 @@ int main()
 
 void client_main()
 {
-	TCPSocket sock({ Address::localAddress, CLIENT_PORT });
+	Socket sock({ "127.0.0.1", CLIENT_PORT }, Socket::TransportProtocol::TCP);
 	if (sock.isValid())
 	{
-		if (sock.connect({ Address::localAddress, SERVER_PORT }))
+		if (sock.connect({ "127.0.0.1", SERVER_PORT }))
 		{
 			cout << "Socket connected successfully!" << endl;
-			std::string message{};
-			if (sock.receive(message))
+			
+			char buffer[3000];
+			const std::size_t buffer_size = sizeof(buffer);
+			int32_t byteRead{ 0 };
+
+			if (sock.receive((uint8_t*)buffer, buffer_size, byteRead))
 			{
-				cout << "Message: " << message << endl;
+				cout << "Message: " << std::string{ buffer, (unsigned int)byteRead } << endl;
 			}
 			else cout << "Unable to receive a message" << endl;
 		}
 		else
 		{
-			cout << "Invalid socket connection: " << starnet::getErrorMessage() << endl;
+			cout << "Invalid socket connection: " << endl;
 		}
 	}
 	else
 	{
-		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
+		cout << "Invalid socket creation: " << endl;
 	}
 }
 
 void server_main()
 {
-	TCPSocket sock({ Address::localAddress, SERVER_PORT });
+	Socket sock({ "127.0.0.1", SERVER_PORT }, Socket::TransportProtocol::TCP);
 	if (sock.isValid())
 	{
 		if (sock.bind())
 		{
-			if (sock.listen())
+			if (sock.listen(20))
 			{
 				cout << "Socket listening successfully!" << endl;
 
-				if (TCPSocket* clientSocket = sock.accept())
+				if (Socket* clientSocket = sock.accept())
 				{
 					cout << "Press to send a message...";
 					getchar();
-					if (clientSocket->send("ciao mondo"))
+
+					std::string message = "ciao";
+					int byteSent = 0;
+
+					if (clientSocket->send(
+						(uint8_t*)message.c_str(),
+						message.size(),
+						byteSent
+					))
 					{
 						cout << "Message sent!" << endl;
 					}
@@ -83,11 +96,11 @@ void server_main()
 		}
 		else
 		{
-			cout << "Invalid socket binding: " << starnet::getErrorMessage() << endl;
+			cout << "Invalid socket binding: " << endl;
 		}
 	}
 	else
 	{
-		cout << "Invalid socket creation: " << starnet::getErrorMessage() << endl;
+		cout << "Invalid socket creation: " << endl;
 	}
 }

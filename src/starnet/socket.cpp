@@ -72,7 +72,7 @@ namespace starnet
 
 	bool Socket::receive(uint8_t * data, std::size_t bufferSize, int32_t & bytesRead)
 	{
-		const int bytecount = ::recv(
+		bytesRead = ::recv(
 			m_socket,
 			reinterpret_cast<char*>(data),
 			bufferSize,
