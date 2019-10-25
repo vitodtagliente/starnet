@@ -1,4 +1,4 @@
-#include "../starnet/address.h"
+#include "address.h"
 
 namespace starnet
 {

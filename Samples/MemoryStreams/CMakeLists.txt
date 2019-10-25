@@ -3,7 +3,7 @@ get_filename_component(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 string(REPLACE " " "_" ProjectId ${ProjectId})
 project(${ProjectId})
 
-include_directories(. ../../)
+include_directories(. ../../src/)
 
 file(GLOB PROJECT_HEADERS *.h) 
 file(GLOB PROJECT_SOURCES *.cpp)

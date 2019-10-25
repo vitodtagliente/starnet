@@ -1,4 +1,4 @@
-#include "../starnet/socket.h"
+#include "socket.h"
 
 namespace starnet
 {
