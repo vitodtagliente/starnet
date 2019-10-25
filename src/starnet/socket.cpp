@@ -87,7 +87,7 @@ namespace starnet
 		return false;
 	}
 
-	bool Socket::receiveFrom(Address & address, uint8_t * data, std::size_t bufferSize, int32_t & bytesRead)
+	bool Socket::receiveFrom(const Address & address, uint8_t * data, std::size_t bufferSize, int32_t & bytesRead)
 	{
 		Address::native_addr_t native_address{};
 
@@ -108,7 +108,7 @@ namespace starnet
 
 		if (bytesRead >= 0)
 		{
-			address = { native_address };
+			// address = { native_address };
 			// For Streaming sockets, 0 indicates a graceful failure
 			return (m_type != Socket::Type::Stream) || (bytesRead > 0);
 		}

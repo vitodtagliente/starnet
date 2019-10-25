@@ -32,7 +32,8 @@ add_library(
 )
 
 add_subdirectory(Samples/BaseTest)
-add_subdirectory(Samples/EchoServer)
 add_subdirectory(Samples/BaseUDPChat)
 add_subdirectory(Samples/BaseTCPChat)
+add_subdirectory(Samples/EchoServer)
+add_subdirectory(Samples/HttpServer)
 add_subdirectory(Samples/MemoryStreams)

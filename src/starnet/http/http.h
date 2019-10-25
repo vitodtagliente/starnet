@@ -1,6 +1,3 @@
 #pragma once 
 
-namespace starnet
-{
-
-}
+#include "http_server.h"

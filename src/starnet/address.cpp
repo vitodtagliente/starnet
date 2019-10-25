@@ -36,8 +36,10 @@ namespace starnet
 
 	Address::Address(const native_addr_t & address)
 		: m_address(address)
+		, m_protocol(NetworkProtocol::Unknown)
 	{
-		// #todo: retrieve the protocol
+		// #todo to be implemented
+		m_protocol = NetworkProtocol::Unknown;
 	}
 
 	Address::port_t Address::getPort() const
@@ -74,6 +76,17 @@ namespace starnet
 	{
 		// #todo: to be implemented
 		return m_protocol == other.m_protocol;
+	}
+
+	bool Address::operator!= (const Address& other) const
+	{
+		// #todo: to be implemented
+		return m_protocol != other.m_protocol;
+	}
+
+	const std::string& Address::toString() const
+	{
+		return getIP() + ":" + std::to_string(getPort());
 	}
 
 	void Address::initialize(const std::string& ip, const port_t port, const NetworkProtocol protocol)
@@ -115,5 +128,11 @@ namespace starnet
 			return NetworkProtocol::IPv6;
 		else // Unknown
 			return NetworkProtocol::Unknown;
+	}
+	
+	Address::NetworkProtocol Address::NetworkProtocolInfo::resolve(const std::string& ip)
+	{
+		// #todo
+		return NetworkProtocol::Unknown;
 	}
 }
