@@ -24,6 +24,7 @@
  */
 
 #include <string>
+#include <vector>
 
 namespace starnet
 {
@@ -36,8 +37,23 @@ namespace starnet
 
 		bool isValid() const;
 
+		inline std::string getScheme() const { return m_schema; }
+		inline std::string getAuthority() const;
+		inline std::string getHost() const { return m_host; }
+		inline size_t getPort() const { return m_port; }
+		std::string getQuery() const;
+		inline std::vector<std::string> getPath() const { return m_path; }
+		inline std::string getFragment() const { return m_fragment; }
+
+		std::string toString() const;
+
 	private:
 
+		std::string m_schema;
+		std::string m_host;
+		size_t m_port;
+		std::vector<std::string> m_path;
+		std::string m_fragment;
 
 	};
 }
