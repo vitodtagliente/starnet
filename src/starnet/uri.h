@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 namespace starnet
 {
@@ -41,8 +42,8 @@ namespace starnet
 		inline std::string getAuthority() const;
 		inline std::string getHost() const { return m_host; }
 		inline size_t getPort() const { return m_port; }
-		std::string getQuery() const;
 		inline std::vector<std::string> getPath() const { return m_path; }
+		std::string getQuery() const;
 		inline std::string getFragment() const { return m_fragment; }
 
 		std::string toString() const;
@@ -53,6 +54,7 @@ namespace starnet
 		std::string m_host;
 		size_t m_port;
 		std::vector<std::string> m_path;
+		std::unordered_map<std::string, std::string> m_query;
 		std::string m_fragment;
 
 	};
