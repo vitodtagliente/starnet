@@ -35,6 +35,7 @@ namespace starnet
 
 		Uri();
 		Uri(const std::string& uriString);
+		Uri(const Uri& other);
 
 		bool isValid() const;
 
@@ -48,6 +49,10 @@ namespace starnet
 
 		std::string toString() const;
 
+		Uri& operator= (const Uri& other);
+		bool operator== (const Uri& other) const;
+		bool operator!= (const Uri& other) const;
+
 	private:
 
 		std::string m_schema;
@@ -56,6 +61,8 @@ namespace starnet
 		std::vector<std::string> m_path;
 		std::unordered_map<std::string, std::string> m_query;
 		std::string m_fragment;
+
+		static std::vector<std::string> split(const std::string& str, const char delimiter);
 
 	};
 }

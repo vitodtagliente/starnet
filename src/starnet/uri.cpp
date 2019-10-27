@@ -1,5 +1,7 @@
 #include "uri.h"
 
+#include <sstream>
+
 namespace starnet
 {
 	Uri::Uri()
@@ -60,13 +62,25 @@ namespace starnet
 		if (queryDelimiter != std::string::npos)
 		{
 			std::string query = temp.substr(queryDelimiter + 1, temp.length());
-			
+			for (const std::string& part : split(query, '&'))
+			{
+				const auto& pair = split(part, '=');
+				if (pair.size() == 2)
+				{
+					m_query.insert({ pair[0], pair[1] });
+				}
+			}
 
 			temp = temp.substr(0, queryDelimiter);
 		}
 
 		// extract the path
+		m_path = split(temp, '/');
+	}
 
+	Uri::Uri(const Uri& other)
+	{
+		*this = other;
 	}
 	
 	bool Uri::isValid() const
@@ -83,11 +97,62 @@ namespace starnet
 
 	std::string Uri::getQuery() const
 	{
-		return std::string();
+		std::string result;
+		std::string comma;
+		for (const auto& pair : m_query)
+		{
+			result += (comma + pair.first + "=" + pair.second);
+			comma = "&";
+		}
+		return result;
 	}
 	
 	std::string Uri::toString() const
 	{
 		return std::string();
+	}
+
+	Uri& Uri::operator= (const Uri& other)
+	{
+		m_schema = other.m_schema;
+		m_host = other.m_host;
+		m_port = other.m_port;
+		m_path = other.m_path;
+		m_query = other.m_query;
+		m_fragment = other.m_fragment;
+
+		return *this;
+	}
+
+	bool Uri::operator== (const Uri& other) const
+	{
+		return m_schema == other.m_schema
+			&& m_host == other.m_host
+			&& m_port == other.m_port
+			&& m_path == other.m_path
+			&& m_query == other.m_query
+			&& m_fragment == other.m_fragment;
+	}
+
+	bool Uri::operator!= (const Uri& other) const
+	{
+		return m_schema != other.m_schema
+			|| m_host != other.m_host
+			|| m_port != other.m_port
+			|| m_path != other.m_path
+			|| m_query != other.m_query
+			|| m_fragment != other.m_fragment;
+	}
+	
+	std::vector<std::string> Uri::split(const std::string& str, const char delimiter)
+	{
+		std::vector<std::string> tokens;
+		std::string token;
+		std::istringstream tokenStream(str);
+		while (std::getline(tokenStream, token, delimiter))
+		{
+			tokens.push_back(token);
+		}
+		return tokens;
 	}
 }
