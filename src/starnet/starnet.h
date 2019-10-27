@@ -8,7 +8,7 @@ namespace starnet
 {
 	bool startup()
 	{
-#if WIN32
+#if PLATFORM_WINDOWS
 		WSADATA wsaData;
 		WORD dllVersion = MAKEWORD(2, 2);
 		return WSAStartup(dllVersion, &wsaData) == 0;
@@ -19,7 +19,7 @@ namespace starnet
 
 	bool shutdown()
 	{
-#if WIN32 
+#if PLATFORM_WINDOWS 
 		return WSACleanup() == 0;
 #else 
 		// Unix

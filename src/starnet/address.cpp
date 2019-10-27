@@ -129,10 +129,4 @@ namespace starnet
 		else // Unknown
 			return NetworkProtocol::Unknown;
 	}
-	
-	Address::NetworkProtocol Address::NetworkProtocolInfo::resolve(const std::string& ip)
-	{
-		// #todo
-		return NetworkProtocol::Unknown;
-	}
 }

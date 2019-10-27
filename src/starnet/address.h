@@ -25,8 +25,6 @@ namespace starnet
 		{
 			static network_proto_t resolve(const NetworkProtocol protocol);
 			static NetworkProtocol resolve(const network_proto_t protocol);
-			// get the network protocol by the ip address
-			static NetworkProtocol resolve(const std::string& ip);
 		};
 
 		// native address type
