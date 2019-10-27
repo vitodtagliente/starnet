@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../uri.h"
+#include "../internet/uri.h"
 
 namespace starnet
 {
 	namespace http
 	{
-		class Url : public Uri
+		class Url : public internet::Uri
 		{
 
 		};
