@@ -1,15 +1,13 @@
 #pragma once
 
+#include "../uri.h"
+
 namespace starnet
 {
 	namespace http
 	{
-		class Uri
+		class Url : public Uri
 		{
-		public:
-
-		private:
-
 
 		};
 	}
