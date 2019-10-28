@@ -7,45 +7,24 @@ namespace starnet
 	namespace internet
 	{
 		Uri::Uri()
-			: m_schema()
-			, m_host()
-			, m_port(0)
-			, m_path()
-			, m_query()
-			, m_fragment()
+			: components()
 		{
 
 		}
 
 		Uri::Uri(const std::string& uriString)
-			: m_schema()
-			, m_host()
-			, m_port(0)
-			, m_path()
-			, m_query()
-			, m_fragment()
+			: components()
 		{
 			// extract the schema
 			const auto schemaDelimiter = uriString.find(':');
-			m_schema = uriString.substr(0, schemaDelimiter);
+			components.schema = uriString.substr(0, schemaDelimiter);
 
 			// extract the authority component
 			std::string temp = uriString.substr(schemaDelimiter + 1, uriString.length());
 			if (temp.substr(0, 2) == "//")
 			{
 				const auto authorityDelimiter = temp.find('/', 2);
-				const std::string& authority = temp.substr(2, authorityDelimiter - 2);
-
-				const auto hostDelimiter = authority.find(':');
-				if (hostDelimiter != std::string::npos)
-				{
-					m_host = authority.substr(0, hostDelimiter);
-					m_port = std::atoi(authority.substr(hostDelimiter + 1, authority.length()).c_str());
-				}
-				else
-				{
-					m_host = authority;
-				}
+				components.authority = Implementation::Authority::parse(temp.substr(2, authorityDelimiter - 2));
 
 				temp = temp.substr(authorityDelimiter + 1, temp.length());
 			}
@@ -54,7 +33,7 @@ namespace starnet
 			const auto fragmentDelimiter = temp.find('#');
 			if (fragmentDelimiter != std::string::npos)
 			{
-				m_fragment = temp.substr(fragmentDelimiter + 1, temp.length());
+				components.fragment = temp.substr(fragmentDelimiter + 1, temp.length());
 
 				temp = temp.substr(0, fragmentDelimiter);
 			}
@@ -69,7 +48,7 @@ namespace starnet
 					const auto& pair = split(part, '=');
 					if (pair.size() == 2)
 					{
-						m_query.insert({ pair[0], pair[1] });
+						components.query.insert({ pair[0], pair[1] });
 					}
 				}
 
@@ -77,7 +56,7 @@ namespace starnet
 			}
 
 			// extract the path
-			m_path = split(temp, '/');
+			components.path = split(temp, '/');
 		}
 
 		Uri::Uri(const Uri& other)
@@ -87,68 +66,69 @@ namespace starnet
 
 		bool Uri::isValid() const
 		{
-			return false;
+			return components.schema.length() > 0;
 		}
 
-		std::string Uri::getAuthority() const
+		bool Uri::hasHost() const
 		{
-			if (m_port > 0)
-				return m_host + ":" + std::to_string(m_port);
-			return m_host;
+			return components.authority.host.length() > 0;
 		}
 
-		std::string Uri::getQuery() const
+		bool Uri::hasPassword() const
 		{
-			std::string result;
-			std::string comma;
-			for (const auto& pair : m_query)
-			{
-				result += (comma + pair.first + "=" + pair.second);
-				comma = "&";
-			}
-			return result;
+			return components.authority.userinfo.password.length() > 0;
 		}
 
 		bool Uri::hasPort() const
 		{
-			return m_port != 0;
+			return components.authority.port != 0;
 		}
 
 		std::string Uri::toString() const
 		{
-			return std::string();
+			std::string result = components.schema + ":";
+
+			const std::string authority = components.authority.toString();
+			if (authority.length() > 0)
+				result += ("//" + authority + "/");
+			
+			std::string comma;
+			for (const std::string path : components.path)
+			{
+				result += (comma + path);
+				comma = "/";
+			}
+
+			if (components.query.size() > 0)
+				result += "?";
+			comma = "";
+			for (const auto& pair : components.query)
+			{
+				result += (pair.first + "=" + pair.second);
+				comma = "&";
+			}
+
+			if (components.fragment.length() > 0)
+				result += ("#" + components.fragment);
+
+			return result;
 		}
 
 		Uri& Uri::operator= (const Uri& other)
 		{
-			m_schema = other.m_schema;
-			m_host = other.m_host;
-			m_port = other.m_port;
-			m_path = other.m_path;
-			m_query = other.m_query;
-			m_fragment = other.m_fragment;
+			components = other.components;
 
 			return *this;
 		}
 
 		bool Uri::operator== (const Uri& other) const
 		{
-			return m_schema == other.m_schema
-				&& m_host == other.m_host
-				&& m_port == other.m_port
-				&& m_path == other.m_path
-				&& m_query == other.m_query
-				&& m_fragment == other.m_fragment;
+			return components == other.components;
 		}
 
 		bool Uri::operator!= (const Uri& other) const
 		{
-			return m_schema != other.m_schema
-				|| m_host != other.m_host
-				|| m_port != other.m_port
-				|| m_path != other.m_path
-				|| m_query != other.m_query
-				|| m_fragment != other.m_fragment;
+			return components != other.components;
 		}
 
 		std::vector<std::string> Uri::split(const std::string& str, const char delimiter)
@@ -161,6 +141,120 @@ namespace starnet
 				tokens.push_back(token);
 			}
 			return tokens;
+		}
+		
+		bool Uri::Implementation::operator==(const Implementation& other) const
+		{
+			return schema == other.schema
+				&& authority == other.authority
+				&& path == other.path
+				&& query == other.query
+				&& fragment == other.fragment;
+		}
+		
+		bool Uri::Implementation::operator!=(const Implementation& other) const
+		{
+			return schema != other.schema
+				|| authority != other.authority
+				|| path != other.path
+				|| query != other.query
+				|| fragment != other.fragment;
+		}
+		
+		bool Uri::Implementation::Authority::operator==(const Authority& other) const
+		{
+			return userinfo == other.userinfo
+				&& host == other.host
+				&& port == other.port;
+		}
+		
+		bool Uri::Implementation::Authority::operator!=(const Authority& other) const
+		{
+			return userinfo != other.userinfo
+				|| host != other.host
+				|| port != other.port;
+		}
+
+		std::string Uri::Implementation::Authority::toString() const
+		{
+			std::string result = userinfo.toString();
+
+			if (result.length() > 0)
+				result += "@";
+			result += host;
+			if (port > 0)
+				result += (":" + std::to_string(port));
+
+			return result;
+		}
+
+		Uri::Implementation::Authority Uri::Implementation::Authority::parse(const std::string& source)
+		{
+			Authority authority;
+
+			std::string temp = source;
+			const auto userinfoDelimiter = source.find('@');
+			if (userinfoDelimiter != std::string::npos)
+			{
+				authority.userinfo = Userinfo::parse(source.substr(0, userinfoDelimiter));
+			}
+			else
+			{
+				temp = source.substr(userinfoDelimiter + 1, source.length());
+			}
+
+			const auto hostDelimiter = source.find(':');
+			if (hostDelimiter != std::string::npos)
+			{
+				authority.host = temp.substr(0, hostDelimiter);
+				authority.port = std::atoi(source.substr(hostDelimiter + 1, source.length()).c_str());
+			}
+			else
+			{
+				authority.host = temp;
+			}			
+
+			return authority;
+		}
+		
+		bool Uri::Implementation::Authority::Userinfo::operator==(const Userinfo& other) const
+		{
+			return username == other.username
+				&& password == other.password;
+		}
+		
+		bool Uri::Implementation::Authority::Userinfo::operator!=(const Userinfo& other) const
+		{
+			return username != other.username
+				|| password != other.password;
+		}
+
+		std::string Uri::Implementation::Authority::Userinfo::toString() const
+		{
+			std::string result = username;
+
+			if (password.length() > 0)
+				result += (":" + password);
+
+			return result;
+		}
+		
+		Uri::Implementation::Authority::Userinfo Uri::Implementation::Authority::Userinfo::parse(const std::string& source)
+		{
+			Userinfo userinfo;
+
+			const auto delimiter = source.find(':');
+			if (delimiter != std::string::npos)
+			{
+				userinfo.username = source.substr(0, delimiter);
+				userinfo.password = source.substr(delimiter + 1, source.length());
+			}
+			else
+			{
+				userinfo.username = source;
+			}
+
+			return userinfo;
 		}
 	}
 }

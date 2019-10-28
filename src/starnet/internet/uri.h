@@ -41,14 +41,15 @@ namespace starnet
 
 			bool isValid() const;
 
-			inline std::string getScheme() const { return m_schema; }
-			inline std::string getAuthority() const;
-			inline std::string getHost() const { return m_host; }
-			inline uint16_t getPort() const { return m_port; }
-			inline std::vector<std::string> getPath() const { return m_path; }
-			std::string getQuery() const;
-			inline std::string getFragment() const { return m_fragment; }
+			std::string getScheme() const { return components.schema; }
+			std::string getHost() const { return components.authority.host; }
+			uint16_t getPort() const { return components.authority.port; }
+			const std::vector<std::string>& getPath() const { return components.path; }
+			const std::unordered_map<std::string, std::string>& getQuery() const { return components.query; }
+			std::string getFragment() const { return components.fragment; }
 
+			bool hasHost() const;
+			bool hasPassword() const;
 			bool hasPort() const;
 
 			std::string toString() const;
@@ -57,14 +58,46 @@ namespace starnet
 			bool operator== (const Uri& other) const;
 			bool operator!= (const Uri& other) const;
 
-		private:
+			struct Implementation
+			{
+				std::string schema;
 
-			std::string m_schema;
-			std::string m_host;
-			uint16_t m_port;
-			std::vector<std::string> m_path;
-			std::unordered_map<std::string, std::string> m_query;
-			std::string m_fragment;
+				struct Authority
+				{
+					struct Userinfo
+					{
+						std::string username;
+						std::string password;
+
+						bool operator== (const Userinfo& other) const;
+						bool operator!= (const Userinfo& other) const;
+						std::string toString() const;
+
+						static Userinfo parse(const std::string& source);
+
+					} userinfo;
+
+					std::string host;
+					uint16_t port;
+
+					bool operator== (const Authority& other) const;
+					bool operator!= (const Authority& other) const;
+					std::string toString() const;
+
+					static Authority parse(const std::string& source);
+
+				} authority;
+
+				std::vector<std::string> path;
+				std::unordered_map<std::string, std::string> query;
+				std::string fragment;
+
+				bool operator== (const Implementation& other) const;
+				bool operator!= (const Implementation& other) const;
+
+			} components;
+
+		private:
 
 			static std::vector<std::string> split(const std::string& str, const char delimiter);
 

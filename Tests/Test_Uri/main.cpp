@@ -9,6 +9,7 @@ int main()
 {
 	internet::Uri uri("foo://example.com:8042/over/there?name=ferret#nose");
 	internet::Uri urn("urn:example:animal:ferret:nose");
+	cout << uri.toString() << endl;
 
 	return 0;
 }
