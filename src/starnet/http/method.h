@@ -7,10 +7,13 @@ namespace starnet
 		enum class Method
 		{
 			Get,
+			Head,
 			Post,
 			Put,
 			Delete,
-			Patch
+			Connect,
+			Options,
+			Trace
 		};
 	}
 }
