@@ -1,14 +1,16 @@
 #pragma once
 
-#include "message.h"
-
 namespace starnet
 {
 	namespace http
 	{
-		class Response : public Message
+		enum class Method
 		{
-
+			Get,
+			Post,
+			Put,
+			Delete,
+			Patch
 		};
 	}
 }
