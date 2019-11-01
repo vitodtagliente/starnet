@@ -10,10 +10,8 @@ namespace starnet
 		{
 		public:
 
-
-
-		private:
-
+			Request() : Message() {}
+			Request(const std::string& source) : Message(source) {}
 
 		};
 	}

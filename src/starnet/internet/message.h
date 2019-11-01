@@ -8,6 +8,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace starnet
 {
@@ -24,14 +25,16 @@ namespace starnet
 				std::string toString() const;
 
 				static Header parse(const std::string& str);
+
+			private:
+
+				static std::vector<std::string> getLines(const std::string& str);
 			};
 
-			class Body : public std::string
-			{
-
-			};
+			using Body = std::string;
 
 			Message();
+			Message(const std::string& source);
 
 			Header header;
 			Body body;

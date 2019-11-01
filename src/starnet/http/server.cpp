@@ -1,6 +1,7 @@
 #include "server.h"
 
 #include <iostream>
+#include "request.h"
 
 namespace starnet
 {
@@ -72,7 +73,17 @@ namespace starnet
 				))
 				{
 					std::string data = { buffer, (unsigned int)byteRead };
-					std::cout << data << std::endl;
+					//std::cout << data << std::endl;
+
+					Request request(data);
+					std::cout << request.toString() << std::endl;
+
+					std::string welcome = "welcome";
+					int32_t byteSent;
+					clientSocket->send(
+						reinterpret_cast<const uint8_t*>(welcome.c_str()), 
+						welcome.size(),
+						byteSent);
 				}
 			} while (m_isRunning);
 		}
