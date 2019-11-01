@@ -8,6 +8,12 @@ namespace starnet
 	{
 		class Request : public Message
 		{
+		public:
+
+
+
+		private:
+
 
 		};
 	}

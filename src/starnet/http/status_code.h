@@ -17,6 +17,7 @@ namespace starnet
 
 		enum class StatusCode : unsigned int
 		{
+			Unknown = 0,
 			Continue = 100,
 			SwitchingProtocols = 101,
 			Ok = 200,

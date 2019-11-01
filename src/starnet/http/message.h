@@ -8,7 +8,7 @@ namespace starnet
 	{
 		class Message : public internet::Message
 		{
-
+			
 		};
 	}
 }
