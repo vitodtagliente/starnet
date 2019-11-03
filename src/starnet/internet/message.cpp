@@ -51,25 +51,63 @@ namespace starnet
 		{
 		}
 
-		Message::Message(const std::string& source)
+		Message::Message(const Body& _body)
 			: header()
-			, body()
+			, body(_body)
 		{
-			const auto& headerDelimiter = source.find("\n\n");
-			if (headerDelimiter != std::string::npos)
-			{
-				header = Header::parse(source.substr(0, headerDelimiter));
-				body = source.substr(headerDelimiter + 1, source.length());
-			}
-			else
-			{
-				header = Header::parse(source);
-			}
+		}
+
+		Message::Message(const Header& _header, const Body& _body)
+			: header(_header)
+			, body(_body)
+		{
+		}
+
+		Message::Message(const Message& message)
+			: header(message.header)
+			, body(message.body)
+		{
 		}
 
 		std::string Message::toString() const
 		{
 			return header.toString() + "\n\n" + body;
+		}
+
+		Message Message::parse(const std::string& source)
+		{
+			Message message;
+			const auto& headerDelimiter = source.find("\n\n");
+			if (headerDelimiter != std::string::npos)
+			{
+				message.header = Header::parse(source.substr(0, headerDelimiter));
+				message.body = source.substr(headerDelimiter + 1, source.length());
+			}
+			else
+			{
+				message.header = Header::parse(source);
+			}
+			return message;
+		}
+		
+		Message& Message::operator=(const Message& message)
+		{
+			header = message.header;
+			body = message.body;
+
+			return *this;
+		}
+		
+		bool Message::operator==(const Message& message) const
+		{
+			return header == message.header
+				&& body == message.body;
+		}
+		
+		bool Message::operator!=(const Message& message) const
+		{
+			return header != message.header
+				|| body != message.body;
 		}
 	}
 }

@@ -21,7 +21,7 @@ namespace starnet
 			class Header : public std::map<std::string, std::string>
 			{
 			public:
-
+				
 				std::string toString() const;
 
 				static Header parse(const std::string& str);
@@ -34,12 +34,20 @@ namespace starnet
 			using Body = std::string;
 
 			Message();
-			Message(const std::string& source);
+			Message(const Body& _body);
+			Message(const Header& _header, const Body& _body);
+			Message(const Message& message);
+
+			std::string toString() const;
+
+			static Message parse(const std::string& source);
+
+			Message& operator= (const Message& message);
+			bool operator== (const Message& message) const;
+			bool operator!= (const Message& message) const;
 
 			Header header;
 			Body body;
-
-			std::string toString() const;
 		};
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace starnet
 {
-	class HTTPClient
+	class Client
 	{
 
 	};
