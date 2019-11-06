@@ -75,8 +75,8 @@ namespace starnet
 					std::string data = { buffer, (unsigned int)byteRead };
 					//std::cout << data << std::endl;
 
-					Request request(data);
-					std::cout << request.toString() << std::endl;
+					//Request request(data);
+					//std::cout << request.toString() << std::endl;
 
 					std::string welcome = "welcome";
 					int32_t byteSent;
