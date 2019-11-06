@@ -17,37 +17,25 @@ namespace starnet
 		class Message
 		{
 		public:
-
-			class Header : public std::map<std::string, std::string>
-			{
-			public:
-				
-				std::string toString() const;
-
-				static Header parse(const std::string& str);
-
-			private:
-
-				static std::vector<std::string> getLines(const std::string& str);
-			};
-
-			using Body = std::string;
-
+		
 			Message();
-			Message(const Body& _body);
-			Message(const Header& _header, const Body& _body);
+			Message(const std::string& source);
 			Message(const Message& message);
-
-			std::string toString() const;
-
-			static Message parse(const std::string& source);
+			
+			virtual std::string toString() const;
 
 			Message& operator= (const Message& message);
 			bool operator== (const Message& message) const;
 			bool operator!= (const Message& message) const;
 
-			Header header;
-			Body body;
+			std::map<std::string, std::string> header;
+			std::string body;
+			
+		private:
+
+			static constexpr const char* white_line = "\n\n";
+			
+			static std::vector<std::string> getLines(const std::string& str);
 		};
 	}
 }

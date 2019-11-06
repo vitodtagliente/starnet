@@ -1,6 +1,8 @@
 #pragma once
 
 #include "message.h"
+#include "method.h"
+#include "url.h"
 
 namespace starnet
 {
@@ -10,8 +12,7 @@ namespace starnet
 		{
 		public:
 
-			Request() : Message() {}
-			Request(const std::string& source) : Message(source) {}
+			
 
 		};
 	}

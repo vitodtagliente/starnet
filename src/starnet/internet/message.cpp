@@ -6,20 +6,26 @@ namespace starnet
 {
 	namespace internet
 	{
-		std::string Message::Header::toString() const
+		Message::Message()
+			: header()
+			, body()
 		{
-			std::string result;
-			for (auto it = begin(); it != end(); ++it)
-			{
-				result += (it->first + ": " + it->second + "\n");
-			}
-			return result;
 		}
 
-		Message::Header Message::Header::parse(const std::string& str)
+		Message::Message(const std::string& source)
+			: header()
+			, body()
 		{
-			Header header;			
-			for (const std::string& line : getLines(str))
+			// parse the message
+			const auto& headerDelimiter = source.find(white_line);
+			if (headerDelimiter != std::string::npos)
+			{
+				body = source.substr(headerDelimiter + 1, source.length());
+			}
+
+			for (const std::string& line : getLines(
+				headerDelimiter != std::string::npos ? source.substr(0, headerDelimiter) : source
+			))
 			{
 				const auto& position = line.find(':');
 				if (position != std::string::npos)
@@ -30,37 +36,6 @@ namespace starnet
 						});
 				}
 			}
-			return header;
-		}
-
-		std::vector<std::string> Message::Header::getLines(const std::string& str)
-		{
-			std::vector<std::string> lines;
-			std::istringstream stream(str);
-			std::string line;
-			while (std::getline(stream, line))
-			{
-				lines.push_back(line);
-			}
-			return lines;
-		}
-
-		Message::Message()
-			: header()
-			, body()
-		{
-		}
-
-		Message::Message(const Body& _body)
-			: header()
-			, body(_body)
-		{
-		}
-
-		Message::Message(const Header& _header, const Body& _body)
-			: header(_header)
-			, body(_body)
-		{
 		}
 
 		Message::Message(const Message& message)
@@ -71,23 +46,14 @@ namespace starnet
 
 		std::string Message::toString() const
 		{
-			return header.toString() + "\n\n" + body;
-		}
-
-		Message Message::parse(const std::string& source)
-		{
-			Message message;
-			const auto& headerDelimiter = source.find("\n\n");
-			if (headerDelimiter != std::string::npos)
+			std::string result;
+			// append header
+			for (auto it = header.begin(); it != header.end(); ++it)
 			{
-				message.header = Header::parse(source.substr(0, headerDelimiter));
-				message.body = source.substr(headerDelimiter + 1, source.length());
+				result += (it->first + ": " + it->second + "\n");
 			}
-			else
-			{
-				message.header = Header::parse(source);
-			}
-			return message;
+			// append body
+			return result + "\n\n" + body;
 		}
 		
 		Message& Message::operator=(const Message& message)
@@ -108,6 +74,18 @@ namespace starnet
 		{
 			return header != message.header
 				|| body != message.body;
+		}
+
+		std::vector<std::string> Message::getLines(const std::string& str)
+		{
+			std::vector<std::string> lines;
+			std::istringstream stream(str);
+			std::string line;
+			while (std::getline(stream, line))
+			{
+				lines.push_back(line);
+			}
+			return lines;
 		}
 	}
 }
