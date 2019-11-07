@@ -126,6 +126,11 @@ namespace starnet
 			return components == other.components;
 		}
 
+		bool Uri::operator==(const std::string& other) const
+		{
+			return toString() == other;
+		}
+
 		bool Uri::operator!= (const Uri& other) const
 		{
 			return components != other.components;

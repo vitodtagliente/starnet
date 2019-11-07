@@ -21,21 +21,26 @@ namespace starnet
 			Message();
 			Message(const std::string& source);
 			Message(const Message& message);
-			
+
+			const std::map<std::string, std::string>& getHeader() const { return m_header; }
+			const std::string& getBody() const { return m_body; }
+			bool isValid() const { return m_isValid; }
+
 			virtual std::string toString() const;
 
 			Message& operator= (const Message& message);
 			bool operator== (const Message& message) const;
 			bool operator!= (const Message& message) const;
 
-			std::map<std::string, std::string> header;
-			std::string body;
-			
-		private:
+			static constexpr const char* blankline = "\r\n";
+			static constexpr const char* endline = "\n";
 
-			static constexpr const char* white_line = "\n\n";
+		protected:
 			
-			static std::vector<std::string> getLines(const std::string& str);
+			std::map<std::string, std::string> m_header;
+			std::string m_body;
+			bool m_isValid;
+		
 		};
 	}
 }

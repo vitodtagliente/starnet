@@ -41,7 +41,7 @@ namespace starnet
 
 			bool isValid() const;
 
-			std::string getScheme() const { return components.schema; }
+			std::string getSchema() const { return components.schema; }
 			std::string getHost() const { return components.authority.host; }
 			uint16_t getPort() const { return components.authority.port; }
 			const std::vector<std::string>& getPath() const { return components.path; }
@@ -56,6 +56,7 @@ namespace starnet
 
 			Uri& operator= (const Uri& other);
 			bool operator== (const Uri& other) const;
+			bool operator== (const std::string& other) const;
 			bool operator!= (const Uri& other) const;
 
 			struct Implementation

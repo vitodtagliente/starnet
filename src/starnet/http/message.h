@@ -22,14 +22,14 @@ namespace starnet
 				KeepAlive
 			};
 
-			Message() : internet::Message() {}
+			Message();
 			Message(const std::string& source);
-			Message(const Message& message) : internet::Message(message) {}
+			Message(const Message& message);
 
 			virtual std::string toString() const override;
 
 			void setVersion(const Version version) { m_version = version; }
-			Version getVersione() const { return m_version; }
+			Version getVersion() const { return m_version; }
 
 			void setConnection(const Connection connection);
 			Connection getConnection() const;
