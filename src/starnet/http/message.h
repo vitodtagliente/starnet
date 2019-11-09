@@ -30,7 +30,7 @@ namespace starnet
 
 		// base data representation
 
-		using Request = request_t<internet::header_t, internet::body_t>;
-		using Response = response_t<internet::header_t, internet::body_t>;
+		using Request = request_t<std::unordered_map<std::string, std::string>, std::string>;
+		using Response = response_t<std::unordered_map<std::string, std::string>, std::string>;
 	}
 }

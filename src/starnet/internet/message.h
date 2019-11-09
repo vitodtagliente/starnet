@@ -23,7 +23,7 @@ namespace starnet
 
 			message_t& operator= (const message_t& message);
 			bool operator== (const message_t& message) const;
-			bool operator!= (const message_t& message) const;
+			bool operator!= (const message_t& message) const;			
 		};
 
 		template<typename Header, typename Body>
@@ -51,9 +51,6 @@ namespace starnet
 
 		// generic message data representation
 
-		using header_t = std::unordered_map<std::string, std::string>;
-		using body_t = std::string;
-
-		using Message = message_t<header_t, body_t>;
+		using Message = message_t<std::unordered_map<std::string, std::string>, std::string>;
 	}
 }
