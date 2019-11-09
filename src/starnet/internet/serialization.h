@@ -38,7 +38,7 @@ namespace starnet
 		}
 
 		template <typename Header, typename Body>
-		void deserialize (message_t<Header, Body>& message, const std::string& source)
+		bool deserialize (message_t<Header, Body>& message, const std::string& source)
 		{
 			const auto it = source.find("\r\n");
 			if (it != std::string::npos)
@@ -51,13 +51,14 @@ namespace starnet
 				deserialize(message.header, source);
 				message.body = Body{};
 			}
+			return true;
 		}
 
 		template <typename T>
-		void deserialize(T&, const std::string&) {}
+		bool deserialize(T&, const std::string&) { return false; }
 
 		template <>
-		void deserialize(std::unordered_map<std::string, std::string>& header, const std::string& source)
+		bool deserialize(std::unordered_map<std::string, std::string>& header, const std::string& source)
 		{
 			header.clear();
 			for (const auto& line : String(source).getLines())
@@ -71,12 +72,14 @@ namespace starnet
 						});
 				}
 			}
+			return true;
 		}
 
 		template <>
-		void deserialize(std::string& body, const std::string& source)
+		bool deserialize(std::string& body, const std::string& source)
 		{
 			body = source;
+			return true;
 		}
 	}
 }
