@@ -13,13 +13,7 @@ namespace starnet
 		template <typename Header, typename Body>
 		struct message_t : public internet::message_t<Header, Body>
 		{
-			enum class Version
-			{
-				v11,
-				v2
-			};
 
-			Version version{ v11 };
 		};
 
 		template <typename Header, typename Body>
@@ -33,5 +27,10 @@ namespace starnet
 		{
 			StatusCode code{ StatusCode::Unknown };
 		};
+
+		// base data representation
+
+		using Request = request_t<internet::header_t, internet::body_t>;
+		using Response = response_t<internet::header_t, internet::body_t>;
 	}
 }

@@ -7,21 +7,41 @@ namespace starnet
 {
 	namespace internet
 	{
-		// deserialization
-		// string -> message representation
+		template <typename T>
+		std::string serialize(const T&) {}
+
+		template <>
+		std::string serialize(const header_t& header)
+		{
+			std::string result;
+			for (auto it = header.begin(); it != header.end(); ++it)
+			{
+				result += (it->first + ": " + it->second + "\n");
+			}
+			return result;
+		}
+
+		template <>
+		std::string serialize(const body_t& body)
+		{
+			return body;
+		}
+
 		template <typename Header, typename Body>
-		void operator<< (message_t<Header, Body>& message, const std::string & source)
+		std::string serialize (const message_t<Header, Body>& message)
+		{
+			return serialize<Header>(message.header)
+				+ "\r\n"
+				+ serialize<Body>(message.body); 
+		}
+
+		template <typename Header, typename Body>
+		message_t<Header, Body> deserialize (const std::string& source)
 		{
 
 		}
 
-		// serialization
-		// message -> string representation
-		template <typename Header, typename Body>
-		void operator>> (const message_t<Header, Body>& message, std::string& str)
-		{
-
-		}
+		
 	}
 }
 

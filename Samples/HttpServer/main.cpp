@@ -3,6 +3,7 @@
 #include <starnet/http/http.h>
 
 #include <starnet/internet/message.h>
+#include <starnet/internet/message_serialization.h>
 
 using namespace std;
 using namespace starnet;
@@ -14,7 +15,10 @@ int main()
 	Address address("127.0.0.1:9090");
 	
 	internet::Message message;
-	
+	http::Request request;
+	http::Response response;
+
+	cout << serialize(message);
 
 
 	// http::Server server(address, 20);

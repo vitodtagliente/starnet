@@ -18,19 +18,19 @@ namespace starnet
 		template <typename Header, typename Body>
 		struct message_t
 		{
-			Header m_header;
-			Body m_body;
+			Header header;
+			Body body;
 
 			message_t& operator= (const message_t& message);
 			bool operator== (const message_t& message) const;
-			bool operator!= (const message_t& message) const;			
+			bool operator!= (const message_t& message) const;
 		};
 
 		template<typename Header, typename Body>
 		message_t<Header, Body>& message_t<Header, Body>::operator=(const message_t& message)
 		{
-			m_header = message.m_header;
-			m_body = message.m_body;
+			header = message.header;
+			body = message.body;
 
 			return *this;
 		}
@@ -38,15 +38,15 @@ namespace starnet
 		template<typename Header, typename Body>
 		bool message_t<Header, Body>::operator==(const message_t& message) const
 		{
-			return m_header == message.m_header
-				&& m_body == message.m_body;
+			return header == message.header
+				&& body == message.body;
 		}
 
 		template<typename Header, typename Body>
 		bool message_t<Header, Body>::operator!=(const message_t& message) const
 		{
-			return m_header != message.m_header
-				|| m_body != message.m_body;
+			return header != message.header
+				|| body != message.body;
 		}
 
 		// generic message data representation
