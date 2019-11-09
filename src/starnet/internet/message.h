@@ -8,39 +8,52 @@
 
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace starnet
 {
 	namespace internet
 	{
-		class Message
+		template <typename Header, typename Body>
+		struct message_t
 		{
-		public:
-		
-			Message();
-			Message(const std::string& source);
-			Message(const Message& message);
+			Header m_header;
+			Body m_body;
 
-			const std::map<std::string, std::string>& getHeader() const { return m_header; }
-			const std::string& getBody() const { return m_body; }
-			bool isValid() const { return m_isValid; }
-
-			virtual std::string toString() const;
-
-			Message& operator= (const Message& message);
-			bool operator== (const Message& message) const;
-			bool operator!= (const Message& message) const;
-
-			static constexpr const char* blankline = "\r\n";
-			static constexpr const char* endline = "\n";
-
-		protected:
-			
-			std::map<std::string, std::string> m_header;
-			std::string m_body;
-			bool m_isValid;
-		
+			message_t& operator= (const message_t& message);
+			bool operator== (const message_t& message) const;
+			bool operator!= (const message_t& message) const;			
 		};
+
+		template<typename Header, typename Body>
+		message_t<Header, Body>& message_t<Header, Body>::operator=(const message_t& message)
+		{
+			m_header = message.m_header;
+			m_body = message.m_body;
+
+			return *this;
+		}
+
+		template<typename Header, typename Body>
+		bool message_t<Header, Body>::operator==(const message_t& message) const
+		{
+			return m_header == message.m_header
+				&& m_body == message.m_body;
+		}
+
+		template<typename Header, typename Body>
+		bool message_t<Header, Body>::operator!=(const message_t& message) const
+		{
+			return m_header != message.m_header
+				|| m_body != message.m_body;
+		}
+
+		// generic message data representation
+
+		using header_t = std::unordered_map<std::string, std::string>;
+		using body_t = std::string;
+
+		using Message = message_t<header_t, body_t>;
 	}
 }

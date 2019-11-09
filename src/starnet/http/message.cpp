@@ -1,5 +1,5 @@
 #include "message.h"
-
+/*
 namespace starnet
 {
 	namespace http
@@ -59,5 +59,11 @@ namespace starnet
 			}
 			return Connection::Close;
 		}
+		
+		std::size_t Message::getContentLength() const
+		{
+			return m_body.size();
+		}
 	}
 }
+*/

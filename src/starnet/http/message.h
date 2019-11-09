@@ -1,43 +1,37 @@
 #pragma once
 
+#include <string>
+#include <unordered_map>
 #include "../internet/message.h"
+#include "method.h"
+#include "status_code.h"
 
 namespace starnet
 {
 	namespace http
-	{
-		class Message : public internet::Message
+	{		
+		template <typename Header, typename Body>
+		struct message_t : public internet::message_t<Header, Body>
 		{
-		public:
-
 			enum class Version
 			{
-				v1,
+				v11,
 				v2
 			};
 
-			enum class Connection
-			{
-				Close,
-				KeepAlive
-			};
+			Version version{ v11 };
+		};
 
-			Message();
-			Message(const std::string& source);
-			Message(const Message& message);
+		template <typename Header, typename Body>
+		struct request_t : public message_t<Header, Body>
+		{
+			Method method{ Method::Get };
+		};
 
-			virtual std::string toString() const override;
-
-			void setVersion(const Version version) { m_version = version; }
-			Version getVersion() const { return m_version; }
-
-			void setConnection(const Connection connection);
-			Connection getConnection() const;
-
-		protected:
-
-			Version m_version;
-
+		template <typename Header, typename Body>
+		struct response_t : public message_t<Header, Body>
+		{
+			StatusCode code{ StatusCode::Unknown };
 		};
 	}
 }

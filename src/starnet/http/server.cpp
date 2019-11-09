@@ -1,7 +1,6 @@
 #include "server.h"
 
 #include <iostream>
-#include "request.h"
 
 namespace starnet
 {
