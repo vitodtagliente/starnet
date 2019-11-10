@@ -10,7 +10,7 @@ namespace starnet
 	namespace internet
 	{
 		template <typename T>
-		std::string serialize(const T&) {}
+		std::string serialize(const T&) { return {}; }
 
 		template <>
 		std::string serialize(const std::unordered_map<std::string, std::string>& header)

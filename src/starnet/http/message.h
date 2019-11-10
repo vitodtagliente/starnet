@@ -5,34 +5,24 @@
 #include "../internet/message.h"
 #include "method.h"
 #include "status_code.h"
+#include "header.h"
 
 namespace starnet
 {
 	namespace http
 	{		
+		enum class Version : uint8_t
+		{
+			v1 = 1,
+			v2 = 2
+		};
+
 		template <typename Header, typename Body>
 		struct message_t : public internet::message_t<Header, Body>
 		{
-			enum class Connection
-			{
-				Close,
-				KeepAlive
-			};
+			Version version{ Version::v1 };
 
-			enum class CacheControl
-			{
-
-			};
-
-			enum class ContentEncoding
-			{
-				gzip
-			};
-
-			enum class ContentLanguage
-			{
-
-			};
+			static message_t parse(const std::string& source);
 		};
 
 		template <typename Header, typename Body>
@@ -49,8 +39,8 @@ namespace starnet
 
 		// base data representation
 
-		using Message = message_t<std::unordered_map<std::string, std::string>, std::string>;
-		using Request = request_t<std::unordered_map<std::string, std::string>, std::string>;
-		using Response = response_t<std::unordered_map<std::string, std::string>, std::string>;
+		using Message = message_t<Header, std::string>;
+		using Request = request_t<Header, std::string>;
+		using Response = response_t<Header, std::string>;
 	}
 }

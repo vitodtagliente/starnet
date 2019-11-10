@@ -1,9 +1,11 @@
 #include <iostream>
 #include <starnet/starnet.h>
-#include <starnet/http/http.h>
 
 #include <starnet/internet/message.h>
 #include <starnet/internet/serialization.h>
+
+#include <starnet/http/http.h>
+#include <starnet/http/serialization.h>
 
 using namespace std;
 using namespace starnet;
@@ -36,6 +38,10 @@ int main()
 
 		< / body>
 		< / html>)");
+
+	request.header.insert({ "ciao", "foo" });
+	auto result = request.toString();
+	cout << result;
 	
 	// http::Server server(address, 20);
 	// if (server.listen())
