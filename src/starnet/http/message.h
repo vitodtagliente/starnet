@@ -13,7 +13,26 @@ namespace starnet
 		template <typename Header, typename Body>
 		struct message_t : public internet::message_t<Header, Body>
 		{
+			enum class Connection
+			{
+				Close,
+				KeepAlive
+			};
 
+			enum class CacheControl
+			{
+
+			};
+
+			enum class ContentEncoding
+			{
+				gzip
+			};
+
+			enum class ContentLanguage
+			{
+
+			};
 		};
 
 		template <typename Header, typename Body>
@@ -30,6 +49,7 @@ namespace starnet
 
 		// base data representation
 
+		using Message = message_t<std::unordered_map<std::string, std::string>, std::string>;
 		using Request = request_t<std::unordered_map<std::string, std::string>, std::string>;
 		using Response = response_t<std::unordered_map<std::string, std::string>, std::string>;
 	}

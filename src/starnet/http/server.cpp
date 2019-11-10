@@ -1,6 +1,7 @@
 #include "server.h"
 
 #include <iostream>
+#include "message.h"
 
 namespace starnet
 {
@@ -74,7 +75,6 @@ namespace starnet
 					std::string data = { buffer, (unsigned int)byteRead };
 					//std::cout << data << std::endl;
 
-					//Request request(data);
 					//std::cout << request.toString() << std::endl;
 
 					std::string welcome = "welcome";
