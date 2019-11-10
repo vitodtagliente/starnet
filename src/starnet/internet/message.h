@@ -21,20 +21,13 @@ namespace starnet
 			Header header;
 			Body body;
 
-			message_t& operator= (const message_t& message);
 			bool operator== (const message_t& message) const;
-			bool operator!= (const message_t& message) const;			
+			bool operator!= (const message_t& message) const;
+
+			std::string toString() const;
+			static message_t parse(const std::string& source);
 		};
-
-		template<typename Header, typename Body>
-		message_t<Header, Body>& message_t<Header, Body>::operator=(const message_t& message)
-		{
-			header = message.header;
-			body = message.body;
-
-			return *this;
-		}
-
+		
 		template<typename Header, typename Body>
 		bool message_t<Header, Body>::operator==(const message_t& message) const
 		{

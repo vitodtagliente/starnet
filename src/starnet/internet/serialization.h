@@ -81,5 +81,19 @@ namespace starnet
 			body = source;
 			return true;
 		}
+
+		template <typename Header, typename Body>
+		std::string message_t<Header, Body>::toString() const
+		{
+			return serialize(*this);
+		}
+
+		template <typename Header, typename Body>
+		message_t<Header, Body> message_t<Header, Body>::parse(const std::string& source)
+		{
+			message_t<Header, Body> message;
+			deserialize(message, source);
+			return message;
+		}
 	}
 }

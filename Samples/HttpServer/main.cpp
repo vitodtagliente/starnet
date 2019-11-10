@@ -15,11 +15,12 @@ int main()
 	Address address("127.0.0.1:9090");
 	
 	internet::Message message;
+
 	http::Request request;
 	http::Response response;
 
-	cout << serialize(message);
-	deserialize(message,
+	cout << message.toString();
+	message = internet::Message::parse(
 		R"(HTTP/1.1 200 OK
 		Date: Mon, 27 Jul 2009 12 : 28 : 53 GMT
 		Server : Apache / 2.2.14 (Win32)
