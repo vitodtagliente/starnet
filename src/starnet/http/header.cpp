@@ -1,21 +1,16 @@
 #include "header.h"
 
+#include <string>
+
 namespace starnet
 {
 	namespace http
 	{
-		Header::Connection Header::getConnection() const
+		struct Header
 		{
-			const auto it = find("Connection");
-			if (it != end())
-			{
-				
-			}
-			return Connection::Close;
-		}
+			Header() = delete;
 
-		void Header::setConnection(const Connection connection)
-		{
-		}
+
+		};
 	}
 }

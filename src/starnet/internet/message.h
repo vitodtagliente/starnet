@@ -15,10 +15,10 @@ namespace starnet
 {
 	namespace internet
 	{
-		template <typename Header, typename Body>
+		template <typename Headers, typename Body>
 		struct message_t
 		{
-			Header header;
+			Headers headers;
 			Body body;
 
 			bool operator== (const message_t& message) const;
@@ -28,17 +28,17 @@ namespace starnet
 			static message_t parse(const std::string& source);
 		};
 		
-		template<typename Header, typename Body>
-		bool message_t<Header, Body>::operator==(const message_t& message) const
+		template<typename Headers, typename Body>
+		bool message_t<Headers, Body>::operator==(const message_t& message) const
 		{
-			return header == message.header
+			return headers == message.headers
 				&& body == message.body;
 		}
 
-		template<typename Header, typename Body>
-		bool message_t<Header, Body>::operator!=(const message_t& message) const
+		template<typename Headers, typename Body>
+		bool message_t<Headers, Body>::operator!=(const message_t& message) const
 		{
-			return header != message.header
+			return headers != message.headers
 				|| body != message.body;
 		}
 

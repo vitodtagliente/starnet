@@ -5,7 +5,6 @@
 #include <starnet/internet/serialization.h>
 
 #include <starnet/http/http.h>
-#include <starnet/http/serialization.h>
 
 using namespace std;
 using namespace starnet;
@@ -39,7 +38,7 @@ int main()
 		< / body>
 		< / html>)");
 
-	request.header.insert({ "ciao", "foo" });
+	request.headers.insert({ "ciao", "foo" });
 	auto result = request.toString();
 	cout << result;
 	

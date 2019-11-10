@@ -13,10 +13,10 @@ namespace starnet
 		std::string serialize(const T&) { return {}; }
 
 		template <>
-		std::string serialize(const std::unordered_map<std::string, std::string>& header)
+		std::string serialize(const std::unordered_map<std::string, std::string>& headers)
 		{
 			std::string result;
-			for (auto it = header.begin(); it != header.end(); ++it)
+			for (auto it = headers.begin(); it != headers.end(); ++it)
 			{
 				result += (it->first + ": " + it->second + "\n");
 			}
@@ -29,26 +29,26 @@ namespace starnet
 			return body;
 		}
 
-		template <typename Header, typename Body>
-		std::string serialize (const message_t<Header, Body>& message)
+		template <typename Headers, typename Body>
+		std::string serialize (const message_t<Headers, Body>& message)
 		{
-			return serialize<Header>(message.header)
+			return serialize<Headers>(message.headers)
 				+ "\r\n"
 				+ serialize<Body>(message.body); 
 		}
 
-		template <typename Header, typename Body>
-		bool deserialize (message_t<Header, Body>& message, const std::string& source)
+		template <typename Headers, typename Body>
+		bool deserialize (message_t<Headers, Body>& message, const std::string& source)
 		{
 			const auto it = source.find("\r\n");
 			if (it != std::string::npos)
 			{
-				deserialize(message.header, source.substr(0, it));
+				deserialize(message.headers, source.substr(0, it));
 				deserialize(message.body, source.substr(it + 1, source.length()));
 			}
 			else
 			{
-				deserialize(message.header, source);
+				deserialize(message.headers, source);
 				message.body = Body{};
 			}
 			return true;
@@ -58,15 +58,15 @@ namespace starnet
 		bool deserialize(T&, const std::string&) { return false; }
 
 		template <>
-		bool deserialize(std::unordered_map<std::string, std::string>& header, const std::string& source)
+		bool deserialize(std::unordered_map<std::string, std::string>& headers, const std::string& source)
 		{
-			header.clear();
+			headers.clear();
 			for (const auto& line : String(source).getLines())
 			{
 				const auto& position = line.find(':');
 				if (position != std::string::npos)
 				{
-					header.insert({
+					headers.insert({
 						line.substr(0, position),
 						line.substr(position + 1, line.length())
 						});
@@ -82,16 +82,16 @@ namespace starnet
 			return true;
 		}
 
-		template <typename Header, typename Body>
-		std::string message_t<Header, Body>::toString() const
+		template <typename Headers, typename Body>
+		std::string message_t<Headers, Body>::toString() const
 		{
 			return serialize(*this);
 		}
 
-		template <typename Header, typename Body>
-		message_t<Header, Body> message_t<Header, Body>::parse(const std::string& source)
+		template <typename Headers, typename Body>
+		message_t<Headers, Body> message_t<Headers, Body>::parse(const std::string& source)
 		{
-			message_t<Header, Body> message;
+			message_t<Headers, Body> message;
 			deserialize(message, source);
 			return message;
 		}
