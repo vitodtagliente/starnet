@@ -4,17 +4,17 @@ namespace starnet
 {
 	namespace http
 	{
-		Headers::Connection Headers::getConnection() const
+		Header::Connection Headers::getConnection() const
 		{
-			const auto it = find("Connection");
+			const auto it = find(Header::name<Header::Connection>());
 			if (it != end())
 			{
 				
 			}
-			return Connection::Close;
+			return Header::Connection::Close;
 		}
 
-		void Headers::setConnection(const Connection connection)
+		void Headers::setConnection(const Header::Connection connection)
 		{
 		}
 	}

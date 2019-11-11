@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include "header.h"
 
 namespace starnet
 {
@@ -9,30 +10,8 @@ namespace starnet
 	{
 		class Headers : public std::unordered_map<std::string, std::string>
 		{
-			enum class Connection
-			{
-				Close,
-				KeepAlive
-			};
-
-			enum class CacheControl
-			{
-
-			};
-
-			enum class ContentEncoding
-			{
-				gzip
-			};
-
-			enum class ContentLanguage
-			{
-
-			};
-
-			Connection getConnection() const;
-			void setConnection(const Connection connection);
-			
+			Header::Connection getConnection() const;
+			void setConnection(const Header::Connection connection);
 		};
 	}
 }

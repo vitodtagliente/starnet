@@ -1,16 +1,19 @@
 #include "header.h"
 
-#include <string>
-
 namespace starnet
 {
 	namespace http
 	{
-		struct Header
+		std::string Header::to_string(const Connection connection)
 		{
-			Header() = delete;
+			if (connection == Connection::KeepAlive)
+				return "keep-alive";
+			return "close";
+		}
 
-
-		};
+		void Header::value(const std::string& str, Connection& connection)
+		{
+			connection = (str == "keep-alive") ? Connection::KeepAlive : Connection::Close;
+		}
 	}
 }
