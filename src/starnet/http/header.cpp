@@ -48,5 +48,14 @@ namespace starnet
 			else if (str == "POST") method = Method::Post;
 			// ...
 		}
+
+		std::string Header::to_string(const ContentEncoding encoding)
+		{
+			return std::string();
+		}
+
+		void Header::value(const std::string& str, ContentEncoding& encoding)
+		{
+		}
 	}
 }

@@ -64,6 +64,9 @@ namespace starnet
 
 			static std::string to_string(const Method method);
 			static void value(const std::string& str, Method& method);
+
+			static std::string to_string(const ContentEncoding encoding);
+			static void value(const std::string& str, ContentEncoding& encoding);
 		};
 	}
 }

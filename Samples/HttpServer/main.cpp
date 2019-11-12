@@ -21,7 +21,7 @@ int main()
 	http::Response response;
 
 	cout << message.toString();
-	message = internet::Message::parse(
+	request = http::Request::parse(
 		R"(HTTP/1.1 200 OK
 		Date: Mon, 27 Jul 2009 12 : 28 : 53 GMT
 		Server : Apache / 2.2.14 (Win32)

@@ -49,7 +49,9 @@ namespace starnet
 		template<typename Headers, typename Body>
 		request_t<Headers, Body> request_t<Headers, Body>::parse(const std::string& source)
 		{
-			return request_t();
+			request_t<Headers, Body> request;
+			//request = message_t<Headers, Body>::parse(source);
+			return request;
 		}
 
 		template<typename Headers, typename Body>
