@@ -25,6 +25,8 @@ namespace starnet
 			Header::Version version{ Header::Version::v1 };
 
 			std::string toString() const;
+			
+			static request_t parse(const std::string& source);
 		};
 
 		template <typename Headers, typename Body>
@@ -38,8 +40,16 @@ namespace starnet
 		template<typename Headers, typename Body>
 		inline std::string request_t<Headers, Body>::toString() const
 		{
-			return "tttt"
+			return Header::to_string(method) + " " 
+				+ url.toString() + " "
+				+ Header::to_string(version) + "\n"
 				+ message_t<Headers, Body>::toString();
+		}
+
+		template<typename Headers, typename Body>
+		request_t<Headers, Body> request_t<Headers, Body>::parse(const std::string& source)
+		{
+			return request_t();
 		}
 
 		template<typename Headers, typename Body>

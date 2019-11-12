@@ -7,13 +7,13 @@ namespace starnet
 		std::string Header::to_string(const Version version)
 		{
 			if (version == Version::v2)
-				return "2.0";
-			return "1.1";
+				return "HTTP/2.0";
+			return "HTTP/1.1";
 		}
 
 		void Header::value(const std::string& str, Version& version)
 		{
-			if (str == "2.0") version = Version::v2;
+			if (str == "HTTP/2.0") version = Version::v2;
 			else version = Version::v1;
 		}
 
