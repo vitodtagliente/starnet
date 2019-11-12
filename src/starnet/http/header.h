@@ -11,6 +11,24 @@ namespace starnet
 		{
 			Header() = delete;
 
+			enum class Version : uint8_t
+			{
+				v1 = 1,
+				v2 = 2
+			};
+
+			enum class Method
+			{
+				Get,
+				Head,
+				Post,
+				Put,
+				Delete,
+				Connect,
+				Options,
+				Trace
+			};
+
 			enum class Connection
 			{
 				Close,
@@ -38,8 +56,14 @@ namespace starnet
 			template<> static std::string name<ContentEncoding>() { return "Encoding"; }
 			template<> static std::string name<ContentLanguage>() { return "Content-Language"; }
 
+			static std::string to_string(const Version version);
+			static void value(const std::string& str, Version& version);
+
 			static std::string to_string(const Connection connection);
 			static void value(const std::string& str, Connection& connection);
+
+			static std::string to_string(const Method method);
+			static void value(const std::string& str, Method& method);
 		};
 	}
 }

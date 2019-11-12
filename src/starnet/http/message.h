@@ -3,7 +3,6 @@
 #include <string>
 #include <unordered_map>
 #include "../internet/message.h"
-#include "method.h"
 #include "status_code.h"
 #include "headers.h"
 #include "url.h"
@@ -11,25 +10,19 @@
 namespace starnet
 {
 	namespace http
-	{		
-		enum class Version : uint8_t
-		{
-			v1 = 1,
-			v2 = 2
-		};
-
+	{	
 		template <typename Headers, typename Body>
 		struct message_t : public internet::message_t<Headers, Body>
 		{
-			Version version{ Version::v1 };
-
 			static message_t parse(const std::string& source);
 		};
 
 		template <typename Headers, typename Body>
 		struct request_t : public message_t<Headers, Body>
 		{
-			Method method{ Method::Get };
+			Header::Method method{ Header::Method::Get };
+			Url url{ "/" };
+			Header::Version version{ Header::Version::v1 };
 
 			std::string toString() const;
 		};

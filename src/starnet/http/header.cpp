@@ -4,6 +4,19 @@ namespace starnet
 {
 	namespace http
 	{
+		std::string Header::to_string(const Version version)
+		{
+			if (version == Version::v2)
+				return "2.0";
+			return "1.1";
+		}
+
+		void Header::value(const std::string& str, Version& version)
+		{
+			if (str == "2.0") version = Version::v2;
+			else version = Version::v1;
+		}
+
 		std::string Header::to_string(const Connection connection)
 		{
 			if (connection == Connection::KeepAlive)
@@ -14,6 +27,26 @@ namespace starnet
 		void Header::value(const std::string& str, Connection& connection)
 		{
 			connection = (str == "keep-alive") ? Connection::KeepAlive : Connection::Close;
+		}
+
+		std::string Header::to_string(const Method method)
+		{
+			switch (method)
+			{
+			case Method::Post: return "POST"; break;
+				// ....
+			case Method::Get:
+			default:
+				return "GET";
+				break;
+			}
+		}
+
+		void Header::value(const std::string& str, Method& method)
+		{
+			if (str == "GET") method = Method::Get;
+			else if (str == "POST") method = Method::Post;
+			// ...
 		}
 	}
 }

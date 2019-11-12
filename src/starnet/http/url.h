@@ -15,6 +15,8 @@ namespace starnet
 	{
 		class Url : public internet::Uri
 		{
+		public:
+
 			Url();
 			Url(const std::string& uriString);
 			Url(const Uri& other);
