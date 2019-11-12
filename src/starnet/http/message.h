@@ -35,6 +35,8 @@ namespace starnet
 			StatusCode code{ StatusCode::Unknown };
 
 			std::string toString() const;
+
+			static response_t parse(const std::string& source);
 		};
 
 		template<typename Headers, typename Body>
@@ -50,7 +52,12 @@ namespace starnet
 		request_t<Headers, Body> request_t<Headers, Body>::parse(const std::string& source)
 		{
 			request_t<Headers, Body> request;
-			//request = message_t<Headers, Body>::parse(source);
+
+			static_cast<internet::message_t<Headers, Body>&>(request) = 
+				internet::message_t<Headers, Body>::parse(source);
+
+			// parse method url and version
+
 			return request;
 		}
 
@@ -59,6 +66,19 @@ namespace starnet
 		{
 			return "tyyyy"
 				+ message_t<Headers, Body>::toString();
+		}
+
+		template<typename Headers, typename Body>
+		response_t<Headers, Body> response_t<Headers, Body>::parse(const std::string& source)
+		{
+			response_t<Headers, Body> response;
+
+			static_cast<internet::message_t<Headers, Body>&>(response) =
+				internet::message_t<Headers, Body>::parse(source);
+
+			// parse status code and description
+
+			return response;
 		}
 
 		// base data representation
