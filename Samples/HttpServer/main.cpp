@@ -21,32 +21,31 @@ int main()
 	http::Response response;
 
 	cout << message.toString();
-	request = http::Request::parse(
-		R"(HTTP/1.1 200 OK
-		Date: Mon, 27 Jul 2009 12 : 28 : 53 GMT
-		Server : Apache / 2.2.14 (Win32)
-		Last - Modified : Wed, 22 Jul 2009 19 : 15 : 56 GMT
-		Content - Length : 88
-		Content - Type : text / html
-		Connection : Closed
-		
-		<html>
-		<body>
+	response = http::Response::parse(
+R"(HTTP/1.1 200 OK
+Date: Mon, 27 Jul 2009 12 : 28 : 53 GMT
+Server: Apache/2.2.14 (Win32)
+Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT
+Content-Length: 88
+Content-Type: text/html
+Connection: Closed
 
-		<h1>Hello, World!< / h1>
+<html>
+<body>
 
-		< / body>
-		< / html>)");
+<h1>Hello, World!</h1>
 
-	request.headers.insert({ "ciao", "foo" });
-	auto result = request.toString();
-	cout << result;
+</body>
+</html>)"
+	);
+
+	cout << response.toString();
 	
-	// http::Server server(address, 20);
-	// if (server.listen())
-	// {
-	// 	cout << "Listening... " << address.toString() << endl;
-	// }
+	http::Server server(address, 20);
+	if (server.listen())
+	{
+		cout << "Listening... " << address.toString() << endl;
+	}
 
 	starnet::shutdown();
 

@@ -43,15 +43,14 @@ namespace starnet
 			const auto it = source.find("\r\n");
 			if (it != std::string::npos)
 			{
-				deserialize(message.headers, source.substr(0, it));
-				deserialize(message.body, source.substr(it + 1, source.length()));
+				return deserialize(message.headers, source.substr(0, it))
+					&& deserialize(message.body, source.substr(it + 1, source.length()));
 			}
 			else
 			{
-				deserialize(message.headers, source);
-				message.body = Body{};
+				return deserialize(message.headers, source)
+					&& (message.body = Body{}, true); // comma operator
 			}
-			return true;
 		}
 
 		template <typename T>
@@ -61,7 +60,7 @@ namespace starnet
 		bool deserialize(std::unordered_map<std::string, std::string>& headers, const std::string& source)
 		{
 			headers.clear();
-			for (const auto& line : String(source).getLines())
+			for (const auto& line : starnet::string(source).getLines())
 			{
 				const auto& position = line.find(':');
 				if (position != std::string::npos)

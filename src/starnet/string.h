@@ -5,12 +5,12 @@
 
 namespace starnet
 {
-	class String : public std::string
+	class string : public std::string
 	{
 	public:
 
-		String();
-		String(const std::string& t_str);
+		string();
+		string(const std::string& t_str);
 
 		enum class CompareMode
 		{
@@ -18,7 +18,7 @@ namespace starnet
 			IgnoreCase
 		};
 
-		std::vector<String> split(const char t_delimiter) const;
+		std::vector<string> split(const char t_delimiter) const;
 
 		bool contains(const char t_match) const;
 		bool contains(const std::string& t_match) const;
@@ -28,17 +28,19 @@ namespace starnet
 		bool endsWith(const std::string& t_match,
 			const CompareMode t_mode = CompareMode::CaseSensitive) const;
 
-		String toLower() const;
-		String toUpper() const;
+		string toLower() const;
+		string toUpper() const;
 
-		String trim() const;
-		String trim(const char t_char) const;
-		String ltrim() const;
-		String ltrim(const char t_char) const;
-		String rtrim() const;
-		String rtrim(const char t_char) const;
+		string trim() const;
+		string trim(const char t_char) const;
+		string ltrim() const;
+		string ltrim(const char t_char) const;
+		string rtrim() const;
+		string rtrim(const char t_char) const;
 
 		// retrieve all the string lines
-		std::vector<String> getLines() const;
+		std::vector<string> getLines() const;
+		string getFirstLine() const;
+		
 	};
 }

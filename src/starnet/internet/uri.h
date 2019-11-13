@@ -55,6 +55,7 @@ namespace starnet
 			std::string toString() const;
 
 			Uri& operator= (const Uri& other);
+			Uri& operator= (const std::string& uri);
 			bool operator== (const Uri& other) const;
 			bool operator== (const std::string& other) const;
 			bool operator!= (const Uri& other) const;

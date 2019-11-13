@@ -121,6 +121,11 @@ namespace starnet
 			return *this;
 		}
 
+		Uri& Uri::operator= (const std::string& uri)
+		{			
+			return *this = Uri(uri);
+		}
+
 		bool Uri::operator== (const Uri& other) const
 		{
 			return components == other.components;

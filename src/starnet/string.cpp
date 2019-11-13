@@ -6,22 +6,22 @@
 
 namespace starnet
 {
-	String::String()
+	string::string()
 		: std::string()
 	{
 
 	}
 
-	String::String(const std::string& t_str)
+	string::string(const std::string& t_str)
 		: std::string(t_str)
 	{
 
 	}
 
-	std::vector<String> String::split(const char t_delimiter) const
+	std::vector<string> string::split(const char t_delimiter) const
 	{
-		std::vector<String> tokens;
-		String token;
+		std::vector<string> tokens;
+		string token;
 		std::istringstream tokenStream(*this);
 		while (std::getline(tokenStream, token, t_delimiter))
 		{
@@ -30,17 +30,17 @@ namespace starnet
 		return tokens;
 	}
 
-	bool String::contains(const char t_match) const
+	bool string::contains(const char t_match) const
 	{
 		return find(t_match) != std::string::npos;
 	}
 
-	bool String::contains(const std::string& t_match) const
+	bool string::contains(const std::string& t_match) const
 	{
 		return find(t_match) != std::string::npos;
 	}
 
-	bool String::startsWith(const std::string& t_match,	const CompareMode t_mode) const
+	bool string::startsWith(const std::string& t_match,	const CompareMode t_mode) const
 	{
 		if (t_mode == CompareMode::CaseSensitive)
 		{
@@ -48,42 +48,42 @@ namespace starnet
 		}
 		else
 		{
-			return toLower().find(String(t_match).toLower()) == 0;
+			return toLower().find(string(t_match).toLower()) == 0;
 		}
 	}
 
-	bool String::endsWith(const std::string& t_match, const CompareMode t_mode) const
+	bool string::endsWith(const std::string& t_match, const CompareMode t_mode) const
 	{
 		return false;
 	}
 
-	String String::toLower() const
+	string string::toLower() const
 	{
-		String result(*this);
+		string result(*this);
 		std::transform(result.begin(), result.end(), result.begin(), ::tolower);
 		return result;
 	}
 
-	String String::toUpper() const
+	string string::toUpper() const
 	{
-		String result(*this);
+		string result(*this);
 		std::transform(result.begin(), result.end(), result.begin(), ::toupper);
 		return result;
 	}
 
-	String String::trim() const
+	string string::trim() const
 	{
 		return rtrim().ltrim();
 	}
 
-	String String::trim(const char t_char) const
+	string string::trim(const char t_char) const
 	{
 		return rtrim(t_char).ltrim(t_char); 
 	}
 
-	String String::ltrim() const
+	string string::ltrim() const
 	{
-		String result(*this);
+		string result(*this);
 		auto it2 = std::find_if(
 			result.begin(),
 			result.end(),
@@ -94,9 +94,9 @@ namespace starnet
 		return result;
 	}
 
-	String String::ltrim(const char t_char) const
+	string string::ltrim(const char t_char) const
 	{
-		String result(*this);
+		string result(*this);
 		auto it2 = std::find_if(
 			result.begin(),
 			result.end(),
@@ -107,9 +107,9 @@ namespace starnet
 		return result;
 	}
 
-	String String::rtrim() const
+	string string::rtrim() const
 	{
-		String result(*this);
+		string result(*this);
 		auto it1 = std::find_if(
 			result.rbegin(),
 			result.rend(),
@@ -120,9 +120,9 @@ namespace starnet
 		return result;
 	}
 
-	String String::rtrim(const char t_char) const
+	string string::rtrim(const char t_char) const
 	{
-		String result(*this);
+		string result(*this);
 		auto it1 = std::find_if(
 			result.rbegin(),
 			result.rend(),
@@ -133,9 +133,9 @@ namespace starnet
 		return result;
 	}
 
-	std::vector<String> String::getLines() const
+	std::vector<string> string::getLines() const
 	{
-		std::vector<String> lines;
+		std::vector<string> lines;
 		std::istringstream stream(*this);
 		std::string line;
 		while (std::getline(stream, line))
@@ -143,5 +143,13 @@ namespace starnet
 			lines.push_back(line);
 		}
 		return lines;
+	}
+	
+	string string::getFirstLine() const
+	{
+		std::istringstream stream(*this);
+		std::string line;
+		std::getline(stream, line);
+		return line;
 	}
 }

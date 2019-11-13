@@ -73,16 +73,20 @@ namespace starnet
 				))
 				{
 					std::string data = { buffer, (unsigned int)byteRead };
-					//std::cout << data << std::endl;
 
-					//std::cout << request.toString() << std::endl;
+					Request request = Request::parse(data);
+					std::cout << request.toString();
 
-					std::string welcome = "welcome";
+					Response response;
+					response.body = "<h1>Hello starnet!</h1>";
+					const std::string& welcome_message = response.toString();
+
 					int32_t byteSent;
 					clientSocket->send(
-						reinterpret_cast<const uint8_t*>(welcome.c_str()), 
-						welcome.size(),
-						byteSent);
+						reinterpret_cast<const uint8_t*>(welcome_message.c_str()),
+						welcome_message.size(),
+						byteSent
+					);
 				}
 			} while (m_isRunning);
 		}

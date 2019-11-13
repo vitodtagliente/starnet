@@ -57,5 +57,15 @@ namespace starnet
 		void Header::value(const std::string& str, ContentEncoding& encoding)
 		{
 		}
+		
+		std::string Header::to_string(const StatusCode code)
+		{
+			return std::to_string(static_cast<unsigned int>(code));
+		}
+		
+		void Header::value(const std::string& str, StatusCode& code)
+		{
+			code = static_cast<Header::StatusCode>(std::atoi(str.c_str()));
+		}
 	}
 }

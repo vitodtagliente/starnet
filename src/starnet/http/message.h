@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cassert>
 #include <string>
 #include <unordered_map>
 #include "../internet/message.h"
-#include "status_code.h"
 #include "headers.h"
 #include "url.h"
+#include "../string.h"
 
 namespace starnet
 {
@@ -14,7 +15,7 @@ namespace starnet
 		template <typename Headers, typename Body>
 		struct message_t : public internet::message_t<Headers, Body>
 		{
-			static message_t parse(const std::string& source);
+			Header::Version version{ Header::Version::v1 };
 		};
 
 		template <typename Headers, typename Body>
@@ -22,7 +23,6 @@ namespace starnet
 		{
 			Header::Method method{ Header::Method::Get };
 			Url url{ "/" };
-			Header::Version version{ Header::Version::v1 };
 
 			std::string toString() const;
 			
@@ -32,7 +32,8 @@ namespace starnet
 		template <typename Headers, typename Body>
 		struct response_t : public message_t<Headers, Body>
 		{
-			StatusCode code{ StatusCode::Unknown };
+			Header::StatusCode code{ Header::StatusCode::Unknown };
+			std::string description;
 
 			std::string toString() const;
 
@@ -57,6 +58,10 @@ namespace starnet
 				internet::message_t<Headers, Body>::parse(source);
 
 			// parse method url and version
+			const auto& components = starnet::string(source).getFirstLine().split(' ');
+			if (components.size() > 0) Header::value(components[0], request.method);
+			if (components.size() > 1) request.url = components[1];
+			if (components.size() > 2) Header::value(components[2], request.version);
 
 			return request;
 		}
@@ -64,7 +69,9 @@ namespace starnet
 		template<typename Headers, typename Body>
 		inline std::string response_t<Headers, Body>::toString() const
 		{
-			return "tyyyy"
+			return Header::to_string(version) + " "
+				+ Header::to_string(code) + " "
+				+ description + "\n"
 				+ message_t<Headers, Body>::toString();
 		}
 
@@ -77,7 +84,11 @@ namespace starnet
 				internet::message_t<Headers, Body>::parse(source);
 
 			// parse status code and description
-
+			const auto& components = starnet::string(source).getFirstLine().split(' ');
+			if (components.size() > 0) Header::value(components[0], response.version);
+			if (components.size() > 1) Header::value(components[1], response.code);
+			if (components.size() > 2) response.description = components[2];
+			
 			return response;
 		}
 
