@@ -4,18 +4,9 @@ namespace starnet
 {
 	namespace http
 	{
-		Header::Connection Headers::getConnection() const
+		bool Headers::contains(const std::string& field) const
 		{
-			const auto it = find(Header::name<Header::Connection>());
-			if (it != end())
-			{
-				
-			}
-			return Header::Connection::Close;
-		}
-
-		void Headers::setConnection(const Header::Connection connection)
-		{
+			return find(field) != end();
 		}
 	}
 }

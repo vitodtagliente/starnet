@@ -10,24 +10,8 @@ namespace starnet
 		struct Header
 		{
 			Header() = delete;
-
-			enum class Version : uint8_t
-			{
-				v1 = 1,
-				v2 = 2
-			};
-
-			enum class Method
-			{
-				Get,
-				Head,
-				Post,
-				Put,
-				Delete,
-				Connect,
-				Options,
-				Trace
-			};
+			
+			enum class AcceptCharset {};
 
 			enum class Connection
 			{
@@ -40,23 +24,26 @@ namespace starnet
 				NoCache
 			};
 
-			enum class ContentEncoding
-			{
-				gzip
-			};
+			enum class ContentEncoding {};
 
-			enum class ContentLanguage
-			{
+			enum class ContentLanguage {};
 
-			};
+			enum class ContentLength {};
 
-			enum class StatusCodeCategory : uint8_t
+			enum class Date {};
+
+			enum class Host {};
+
+			enum class Method
 			{
-				Informational = 1,
-				Success = 2,
-				Redirection = 3,
-				ClientError = 4,
-				ServerError = 5
+				Get,
+				Head,
+				Post,
+				Put,
+				Delete,
+				Connect,
+				Options,
+				Trace
 			};
 
 			enum class StatusCode : unsigned int
@@ -102,15 +89,31 @@ namespace starnet
 				HttpVersionNotSupported = 505
 			};
 
+			enum class StatusCodeCategory : uint8_t
+			{
+				Informational = 1,
+				Success = 2,
+				Redirection = 3,
+				ClientError = 4,
+				ServerError = 5
+			};
+
+			enum class Version : uint8_t
+			{
+				v1 = 1,
+				v2 = 2
+			};
+
 			template <typename T> static std::string name() { return {}; }
+			template<> static std::string name<AcceptCharset>() { return "AcceptCharset"; }
 			template<> static std::string name<Connection>() { return "Connection"; }
 			template<> static std::string name<CacheControl>() { return "Cache-Control"; }
 			template<> static std::string name<ContentEncoding>() { return "Encoding"; }
 			template<> static std::string name<ContentLanguage>() { return "Content-Language"; }
-
-			static std::string to_string(const Version version);
-			static void value(const std::string& str, Version& version);
-
+			template<> static std::string name<ContentLength>() { return "Content-Length"; }
+			template<> static std::string name<Date>() { return "Date"; }
+			template<> static std::string name<Host>() { return "Host"; }
+			
 			static std::string to_string(const Connection connection);
 			static void value(const std::string& str, Connection& connection);
 
@@ -122,6 +125,9 @@ namespace starnet
 
 			static std::string to_string(const StatusCode code);
 			static void value(const std::string& str, StatusCode& code);
+
+			static std::string to_string(const Version version);
+			static void value(const std::string& str, Version& version);
 		};
 	}
 }
