@@ -23,11 +23,22 @@ namespace starnet
 			template <typename T>
 			void set(const std::string& value)
 			{
-				const auto it = find(Header::name<T>());
+				const std::string& name = Header::name<T>();
+				const auto it = find(name);
 				if (it != end())
 				{
 					it->second = value;
 				}
+				else
+				{
+					insert({ name, value });
+				}
+			}
+
+			template <typename T>
+			void set(const T value)
+			{
+				set<T>(Header::to_string(value));
 			}
 
 			template <typename T>

@@ -32,7 +32,7 @@ namespace starnet
 		template <typename Headers, typename Body>
 		struct response_t : public message_t<Headers, Body>
 		{
-			Header::StatusCode code{ Header::StatusCode::Unknown };
+			Header::StatusCode code{ Header::StatusCode::Ok };
 			std::string description;
 
 			std::string toString() const;

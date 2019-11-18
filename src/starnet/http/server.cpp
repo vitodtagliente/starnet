@@ -79,6 +79,9 @@ namespace starnet
 
 					Response response;
 					response.body = "<h1>Hello starnet!</h1>";
+					response.headers.set(Header::Connection::Close);
+					response.description = "OK";
+					response.headers.insert({ "expires", "-1" });
 					const std::string& welcome_message = response.toString();
 
 					int32_t byteSent;
