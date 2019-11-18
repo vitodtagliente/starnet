@@ -57,6 +57,12 @@ namespace starnet
 			bool is_object() const { return m_type == Type::Object; }
 			bool is_string() const { return m_type == Type::String; }
 
+			bool as_bool() const { return static_cast<bool>(std::atoi(m_value.c_str())); }
+			int as_int() const { return std::atoi(m_value.c_str()); }
+			float as_float() const { return std::atof(m_value.c_str()); }
+			double as_double() const { return std::stod(m_value.c_str()); }
+			const std::string& as_string() const { return m_value; }
+
 			std::string to_string() const { return m_value; }
 
 		private:
