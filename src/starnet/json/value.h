@@ -65,6 +65,26 @@ namespace starnet
 
 			std::string to_string() const { return m_value; }
 
+			bool operator== (const Value& other) const
+			{
+				return m_type == other.m_type
+					&& m_value == other.m_value;
+			}
+
+			bool operator!= (const Value& other) const
+			{
+				return m_type != other.m_type
+					|| m_value != other.m_value;
+			}
+
+			Value& operator= (const Value& other)
+			{
+				m_type = other.m_type;
+				m_value = other.m_value;
+
+				return *this;
+			}
+
 		private:
 
 			// value type
