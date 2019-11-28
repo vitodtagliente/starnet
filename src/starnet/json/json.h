@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace starnet
@@ -29,49 +30,55 @@ namespace starnet
 			data()
 				: m_type(Type::Null)
 				, m_numberType(NumberType::Undefined)
-				, m_bool()
+				, m_value()
 			{}
 
 			data(const bool value)
 				: m_type(Type::Boolean)
 				, m_numberType(NumberType::Undefined)
-				, m_bool(value)
+				, m_value(value)
 			{}
 
 			data(const int value)
 				: m_type(Type::Number)
 				, m_numberType(NumberType::Int)
-				, m_int(value)
+				, m_value(value)
 			{}
 
 			data(const double value)
 				: m_type(Type::Number)
 				, m_numberType(NumberType::Double)
-				, m_double(value)
+				, m_value(value)
 			{}
 
 			data(const float value)
 				: m_type(Type::Number)
 				, m_numberType(NumberType::Float)
-				, m_float(value)
+				, m_value(value)
+			{}
+
+			data(const char* value)
+				: m_type(Type::String)
+				, m_numberType(NumberType::Undefined)
+				, m_value(std::string(value))
 			{}
 
 			data(const string_t& value)
 				: m_type(Type::String)
 				, m_numberType(NumberType::Undefined)
-				, m_string(value)
+				, m_value(value)
 			{}
 
 			data(const array_t& value)
 				: m_type(Type::Array)
 				, m_numberType(NumberType::Undefined)
-				, m_array(value)
+				, m_value(value)
 			{}
 
 			data(const object_t& value)
 				: m_type(Type::Object)
 				, m_numberType(NumberType::Undefined)
-				, m_object(value)
+				, m_value(value)
 			{}
 
 			bool is_array() const { return m_type == Type::Array; }
@@ -81,69 +88,48 @@ namespace starnet
 			bool is_object() const { return m_type == Type::Object; }
 			bool is_string() const { return m_type == Type::String; }
 
-			bool as_bool() const { return m_bool; }
-			int as_int() const { return m_int; }
-			float as_float() const { return m_float; }
-			double as_double() const { return m_double; }
-			const array_t& as_array() const { return m_array; }
-			const object_t& ar_object() const { return m_object; }
-			const string_t& as_string() const { return m_string; }
+			bool as_bool() const { return std::get<bool>(m_value); }
+			int as_int() const { return std::get<int>(m_value); }
+			float as_float() const { return std::get<float>(m_value); }
+			double as_double() const { return std::get<double>(m_value); }
+			const array_t& as_array() const { return std::get<array_t>(m_value); }
+			const object_t& ar_object() const { return std::get<object_t>(m_value); }
+			const string_t& as_string() const { return std::get<string_t>(m_value); }
 
 			Type type() const { return m_type; }
-
-			string_t to_string() const 
-			{ 
-				switch (m_type)
-				{
-				case Type::Boolean: return std::to_string(m_bool);
-				case Type::Null: return "";
-				case Type::Array: return "";
-				case Type::Object: return "";
-				case Type::Number:
-				{
-					switch (m_numberType)
-					{
-					case NumberType::Int: return std::to_string(m_int);
-					case NumberType::Double: return std::to_string(m_double);
-					case NumberType::Float: return std::to_string(m_float);
-					default: return "";
-					}
-				}
-				default:
-					return m_string;
-				}
-			}
 
 			bool operator== (const data& other) const
 			{
 				if (m_type == other.m_type)
 				{
-					switch (m_type)
-					{
-					case Type::Boolean: return m_bool == other.m_bool;
-					case Type::Null: return true;
-					case Type::String: return m_string == other.m_string;
-					/// #TODO
-					}
+					return m_value == other.m_value;
 				}
 				return false;
 			}
 
 			bool operator!= (const data& other) const
 			{
-				return true; /// TODO
+				if (m_type == other.m_type)
+				{
+					return m_value != other.m_value;
+				}
+				return true;
 			}
 
 			data& operator= (const data& other)
 			{
-				
+				m_type = other.m_type;
+				m_numberType = other.m_numberType;
+				m_value = other.m_value;
 
 				return *this;
 			}
 
 			data& operator= (const bool value)
 			{
-				
+				m_type = Type::Boolean;
+				m_numberType = NumberType::Undefined;
+				m_value = value;
 
 				return *this;
 			}
@@ -151,7 +137,8 @@ namespace starnet
 			data& operator= (const int value)
 			{
 				m_type = Type::Number;
-				m_int = value;
+				m_numberType = NumberType::Int;
+				m_value = value;
 
 				return *this;
 			}
@@ -160,7 +147,7 @@ namespace starnet
 			{
 				m_type = Type::Number;
 				m_numberType = NumberType::Double;
-				m_double = value;
+				m_value = value;
 
 				return *this;
 			}
@@ -169,15 +156,21 @@ namespace starnet
 			{
 				m_type = Type::Number;
 				m_numberType = NumberType::Float;
-				m_float = value;
+				m_value = value;
 
 				return *this;
+			}
+
+			data& operator= (const char* str)
+			{
+				return *this = std::string(str);
 			}
 
 			data& operator= (const std::string& value)
 			{
 				m_type = Type::String;
-				m_string = value;
+				m_numberType = NumberType::Undefined;
+				m_value = value;
 
 				return *this;
 			}
@@ -185,7 +178,8 @@ namespace starnet
 			data& operator= (const array_t& value)
 			{
 				m_type = Type::Array;
-				m_array = value;
+				m_numberType = NumberType::Undefined;
+				m_value = value;
 
 				return *this;
 			}
@@ -193,10 +187,13 @@ namespace starnet
 			data& operator= (const object_t& value)
 			{
 				m_type = Type::Object;
-				m_object = value;
+				m_numberType = NumberType::Undefined;
+				m_value = value;
 
 				return *this;
 			}
+
+
 
 		private:
 
@@ -211,17 +208,8 @@ namespace starnet
 			// value type
 			Type m_type;
 			NumberType m_numberType;
-			// raw data
-			union
-			{
-				bool m_bool;
-				int m_int;
-				float m_float;
-				double m_double;
-				std::string m_string;
-				std::vector<data> m_array;
-				std::map<std::string, data> m_object;
-			};
+			// raw value
+			std::variant<bool, int, float, double, string_t, array_t, object_t> m_value;
 		};
 	}
 }

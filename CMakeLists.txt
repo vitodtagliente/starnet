@@ -38,6 +38,4 @@ add_subdirectory(Samples/BaseTCPChat)
 add_subdirectory(Samples/EchoServer)
 add_subdirectory(Samples/HttpServer)
 add_subdirectory(Samples/MemoryStreams)
-
-# Tests
-add_subdirectory(Tests/Test_Uri)
+add_subdirectory(Samples/JsonTest)
